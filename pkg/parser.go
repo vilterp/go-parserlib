@@ -27,7 +27,7 @@ type ParserStackFrame struct {
 	// TODO: record start pos
 	pos Position
 
-	ruleID RuleID
+	rule Rule
 }
 
 func (g *Grammar) Parse(startRuleName string, input string, cursor int, log logger.Logger) (*TraceTree, error) {
@@ -54,12 +54,12 @@ func (g *Grammar) Parse(startRuleName string, input string, cursor int, log logg
 	return traceTree, nil
 }
 
-func (ps *ParserState) callRule(ruleID RuleID, pos Position, cursor int) (*TraceTree, *ParseError) {
+func (ps *ParserState) callRule(rule Rule, pos Position, cursor int) (*TraceTree, *ParseError) {
 	// Create and push stack frame.
 	stackFrame := &ParserStackFrame{
-		input:  ps.input,
-		ruleID: ruleID,
-		pos:    pos,
+		input: ps.input,
+		rule:  rule,
+		pos:   pos,
 	}
 	ps.stack = append(ps.stack, stackFrame)
 	ps.logger.Indent()
@@ -69,7 +69,7 @@ func (ps *ParserState) callRule(ruleID RuleID, pos Position, cursor int) (*Trace
 	ps.stack = ps.stack[:len(ps.stack)-1]
 	ps.logger.Outdent()
 	if traceTree == nil {
-		panic(fmt.Sprintf("nil trace tree returned for rule %v", ruleID))
+		panic(fmt.Sprintf("nil trace tree returned for rule %v", rule))
 	}
 	// Return.
 	if err != nil {
@@ -91,11 +91,11 @@ func (sf *ParserStackFrame) Errorf(
 
 func (ps *ParserState) runRule(cursor int) (*TraceTree, *ParseError) {
 	frame := ps.stack[len(ps.stack)-1]
-	rule := ps.grammar.ruleForID[frame.ruleID]
+	rule := frame.rule
 	startPos := frame.pos
 	minimalTrace := &TraceTree{
 		grammar:   ps.grammar,
-		RuleID:    frame.ruleID,
+		RuleID:    ps.grammar.idForRule[rule],
 		StartPos:  startPos,
 		CursorPos: 0,
 		EndPos:    startPos,
@@ -104,7 +104,7 @@ func (ps *ParserState) runRule(cursor int) (*TraceTree, *ParseError) {
 	case *choice:
 		trace := &TraceTree{
 			grammar:   ps.grammar,
-			RuleID:    frame.ruleID,
+			RuleID:    ps.grammar.idForRule[rule],
 			StartPos:  startPos,
 			CursorPos: cursor,
 		}
@@ -145,7 +145,7 @@ func (ps *ParserState) runRule(cursor int) (*TraceTree, *ParseError) {
 	case *sequence:
 		trace := &TraceTree{
 			grammar:    ps.grammar,
-			RuleID:     frame.ruleID,
+			RuleID:     ps.grammar.idForRule[rule],
 			StartPos:   startPos,
 			CursorPos:  cursor,
 			ItemTraces: make([]*TraceTree, len(tRule.items)),
@@ -208,7 +208,7 @@ func (ps *ParserState) runRule(cursor int) (*TraceTree, *ParseError) {
 		}
 		return &TraceTree{
 			grammar:   ps.grammar,
-			RuleID:    frame.ruleID,
+			RuleID:    ps.grammar.idForRule[rule],
 			StartPos:  startPos,
 			CursorPos: cursor,
 			EndPos:    refTrace.EndPos,
@@ -231,7 +231,7 @@ func (ps *ParserState) runRule(cursor int) (*TraceTree, *ParseError) {
 		}
 		return &TraceTree{
 			grammar:    ps.grammar,
-			RuleID:     frame.ruleID,
+			RuleID:     ps.grammar.idForRule[rule],
 			StartPos:   startPos,
 			CursorPos:  cursor,
 			EndPos:     endPos,
