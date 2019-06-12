@@ -22,11 +22,10 @@ type TraceTree struct {
 	ItemTraces []*TraceTree `json:",omitempty"`
 	// If it's a regex
 	RegexMatch string
+	// If it's a keyword
+	KeywordMatch string
 	// If it's a ref
 	RefTrace *TraceTree `json:",omitempty"`
-	// If it's a mapper
-	InnerTrace *TraceTree `json:",omitempty"`
-	MapRes     interface{}
 	// If it's a success
 	Success bool
 }
@@ -72,59 +71,6 @@ func (tt *TraceTree) Format() pp.Doc {
 	default:
 		panic(fmt.Sprintf("don't know how to format a %T trace", rule))
 	}
-}
-
-func (tt *TraceTree) GetMapRes() interface{} {
-	if tt.MapRes != nil {
-		return tt.MapRes
-	}
-	if tt.RefTrace != nil {
-		return tt.RefTrace.GetMapRes()
-	}
-	if tt.ChoiceTrace != nil {
-		return tt.ChoiceTrace.GetMapRes()
-	}
-	if tt.ItemTraces != nil {
-		results := make([]interface{}, len(tt.ItemTraces))
-		for idx, thing := range tt.ItemTraces {
-			results[idx] = thing.GetMapRes()
-		}
-		return results
-	}
-	if tt.Success {
-		return nil
-	}
-	return nil
-}
-
-func (tt *TraceTree) GetListRes() []interface{} {
-	// Get list ref.
-	anyItemsChoice := tt
-	// Return empty array if there's nothing.
-	if anyItemsChoice.ChoiceIdx == 1 {
-		return []interface{}{}
-	}
-	return anyItemsChoice.ChoiceTrace.GetList1Res()
-}
-
-func (tt *TraceTree) GetList1Res() []interface{} {
-	justOneItemChoice := tt
-	// If there's just one item, return it.
-	if justOneItemChoice.ChoiceIdx == 1 {
-		return []interface{}{
-			justOneItemChoice.ChoiceTrace.GetMapRes(),
-		}
-	}
-	// Otherwise, there are at least one items.
-	out := make([]interface{}, 1)
-	// Get the first item.
-	seqTrace := justOneItemChoice.ChoiceTrace
-	refTrace := seqTrace.ItemTraces[0].RefTrace
-	out[0] = refTrace.GetMapRes()
-	// Now get the rest.
-	rest := seqTrace.ItemTraces[2].RefTrace.InnerTrace.GetListRes()
-	out = append(out, rest...)
-	return out
 }
 
 func (tt *TraceTree) OptWhitespaceSurroundRes() *TraceTree {

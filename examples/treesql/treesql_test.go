@@ -16,7 +16,8 @@ func TestTreeSQL(t *testing.T) {
 	for i, query := range queries {
 		trace, err := Grammar.Parse("select", query, 0, logger.NewStdoutLogger())
 		if err != nil {
-			t.Fatalf("case %d: %v\n\n%v", i, err, trace.Format())
+			t.Fatalf("case %d: %v\n\n%v\n\n%v", i, err, trace.Format(), trace.ToTree("select").Format().String())
 		}
+		t.Logf("tree:\n\n%v", trace.ToTree("select").Format())
 	}
 }
