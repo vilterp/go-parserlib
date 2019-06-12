@@ -12,6 +12,15 @@ type Node struct {
 	Children []*Node
 }
 
+type TextNode struct {
+	Span SourceSpan
+	Text string
+}
+
+func (tn *TextNode) String() string {
+	return fmt.Sprintf(`"%s"@%v`, tn.Text, tn.Span)
+}
+
 func (tt *TraceTree) ToTree() *Node {
 	rule := tt.Rule
 	name := ""
@@ -76,6 +85,10 @@ func (n *Node) Format() pp.Doc {
 	return pp.Seq(docs)
 }
 
-func (n *Node) Text() string {
-	panic("implement me")
+// TODO(vilterp): point to origInput somewhere from Node??
+func (n *Node) Text(origInput string) *TextNode {
+	return &TextNode{
+		Span: n.Span,
+		Text: n.Span.GetText(origInput),
+	}
 }

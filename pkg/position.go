@@ -35,6 +35,10 @@ func (pos *Position) Newline() Position {
 	}
 }
 
+func (pos *Position) Lt(other Position) bool {
+	return pos.Offset < other.Offset
+}
+
 func (pos *Position) ShowInContext(input string) string {
 	lines := strings.Split(input, "\n")
 	inputLine := lines[pos.Line-1]
@@ -56,4 +60,17 @@ func (ss SourceSpan) Length() int {
 
 func (ss SourceSpan) String() string {
 	return fmt.Sprintf("[%s - %s]", ss.From.CompactString(), ss.To.CompactString())
+}
+
+func (ss SourceSpan) Contains(p Position) bool {
+	return (ss.From == p || ss.From.Lt(p)) && (p.Lt(ss.To) || p == ss.To)
+}
+
+func (ss SourceSpan) GetText(input string) string {
+	lines := strings.Split(input, "\n")
+	if ss.From.Line == ss.To.Line {
+		line := lines[ss.From.Line-1]
+		return line[ss.From.Col-1 : ss.To.Col-1]
+	}
+	panic("TODO: GetText across multiple lines")
 }

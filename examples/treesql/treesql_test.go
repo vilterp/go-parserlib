@@ -95,3 +95,23 @@ func TestTreeSQL(t *testing.T) {
 		})
 	}
 }
+
+func TestToSelect(t *testing.T) {
+	input := `MANY posts {
+	 id,
+   title,
+   body,
+	 comments: MANY comments {
+	   id,
+     body
+	 }
+	}`
+	//input := `MANY posts { id }`
+	traceTree, err := treesql.Grammar.Parse("select", input, 0, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	tree := traceTree.ToTree()
+	sel := treesql.ToSelect(input, tree)
+	t.Log(sel.Format().String())
+}
