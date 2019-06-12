@@ -13,29 +13,46 @@ type Node struct {
 	Children []*Node
 }
 
-func (tt *TraceTree) ToTree(name string) *Node {
+func (tt *TraceTree) ToTree() *Node {
 	rule := tt.grammar.ruleForID[tt.RuleID]
-	n := &Node{
-		Name:     name,
-		StartPos: tt.StartPos,
-		EndPos:   tt.EndPos,
-	}
-	return n
+	name := ""
 	switch tRule := rule.(type) {
 	case *ref:
 		name = tRule.name
+		return &Node{
+			Name:     name,
+			StartPos: tt.StartPos,
+			EndPos:   tt.EndPos,
+			Children: tt.RefTrace.getChildren(),
+		}
+	default:
+		// TODO(vilterp): this is janky.
+		//   needs some kind of refactoring; I'm not sure what
+		name, ok := tt.grammar.nameForID[tt.RuleID]
+		if !ok {
+			panic(fmt.Sprintf("name not found for rule %s", rule.String()))
+		}
+		return &Node{
+			Name:     name,
+			StartPos: tt.StartPos,
+			EndPos:   tt.EndPos,
+			Children: tt.getChildren(),
+		}
 	}
+}
+
+func (tt *TraceTree) getChildren() []*Node {
 	if len(tt.ItemTraces) > 0 {
+		var out []*Node
 		for _, itemTrace := range tt.ItemTraces {
-			tree := itemTrace.ToTree(name)
-			if tree == nil {
+			if itemTrace == nil {
 				continue
 			}
-			n.Children = append(n.Children, tree)
+			out = append(out, itemTrace.getChildren()...)
 		}
-		return n
+		return out
 	} else if tt.ChoiceTrace != nil {
-		return tt.ChoiceTrace.ToTree(name)
+		return tt.ChoiceTrace.getChildren()
 	} else if tt.KeywordMatch != "" {
 		return nil
 	} else if tt.RegexMatch != "" {
@@ -43,9 +60,9 @@ func (tt *TraceTree) ToTree(name string) *Node {
 	} else if tt.Success {
 		return nil
 	} else if tt.RefTrace != nil {
-		return tt.RefTrace.ToTree(name)
+		return []*Node{tt.RefTrace.ToTree()}
 	} else {
-		panic(fmt.Sprintf("don't know how to en-tree a %+v", tt))
+		return nil
 	}
 }
 
@@ -61,11 +78,8 @@ func (n *Node) Format() pp.Doc {
 	if len(n.Children) > 0 {
 		docs = append(
 			docs,
-			pp.Text(" {"),
 			pp.Newline,
 			pp.Indent(2, pp.Join(children, pp.Newline)),
-			pp.Newline,
-			pp.Text("}"),
 		)
 	}
 	return pp.Seq(docs)

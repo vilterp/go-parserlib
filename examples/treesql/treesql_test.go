@@ -17,7 +17,18 @@ type testCase struct {
 func TestTreeSQL(t *testing.T) {
 	testCases := []testCase{
 		{
-			`MANY posts { id }`,
+			`MANY posts {
+  id
+}`,
+			`select [1:1 - 1:18]
+         table_name`,
+			``,
+		},
+		{
+			`MANY posts {
+  id,
+  title
+}`,
 			`select [1:1 - 1:18]
          table_name`,
 			``,
@@ -39,7 +50,7 @@ func TestTreeSQL(t *testing.T) {
 	for i, testCase := range testCases {
 		t.Run(fmt.Sprintf("case %d", i), func(t *testing.T) {
 			trace, err := treesql.Grammar.Parse("select", testCase.input, 0, log)
-			tree := trace.ToTree("select").Format().String()
+			tree := trace.ToTree().Format().String()
 
 			if tree != testCase.output {
 				t.Fatalf("EXPECTED\n\n%v\n\nGOT\n\n%v\n", testCase.output, tree)

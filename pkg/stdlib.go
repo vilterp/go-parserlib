@@ -50,15 +50,15 @@ func OptWhitespaceSurround(r Rule) Rule {
 	})
 }
 
-var Whitespace = &regex{regex: regexp.MustCompile("\\s+")}
+var Whitespace = Regex(regexp.MustCompile("\\s+"))
 
 var CommaOptWhitespace = Sequence([]Rule{Keyword(","), OptWhitespace})
 
-var UnsignedIntLit = &regex{regex: regexp.MustCompile("[0-9]+")}
+var UnsignedIntLit = Regex(regexp.MustCompile("[0-9]+"))
 
-var SignedIntLit = &regex{regex: regexp.MustCompile("-?[0-9]+")}
+var SignedIntLit = Regex(regexp.MustCompile("-?[0-9]+"))
 
 // Thank you https://stackoverflow.com/a/2039820
-var StringLit = &regex{regex: regexp.MustCompile(`\"(\\.|[^"\\])*\"`)}
+var StringLit = Regex(regexp.MustCompile(`\"(\\.|[^"\\])*\"`))
 
-var Ident = &regex{regex: regexp.MustCompile("[a-zA-Z_][a-zA-Z0-9_]*")}
+var Ident = Regex(regexp.MustCompile("[a-zA-Z_][a-zA-Z0-9_]*"))

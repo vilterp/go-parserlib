@@ -23,7 +23,7 @@ var grammarRules = map[string]p.Rule{
 		p.Whitespace,
 		p.Opt(p.Ref("where_clause")),
 		p.OptWhitespace,
-		p.Ref("selection"),
+		p.Ref("selections"),
 	}),
 	"table_name":  p.Ident,
 	"column_name": p.Ident,
@@ -36,7 +36,7 @@ var grammarRules = map[string]p.Rule{
 		p.OptWhitespace,
 		p.Ref("expr"),
 	}),
-	"selection": p.Sequence([]p.Rule{
+	"selections": p.Sequence([]p.Rule{
 		p.Keyword("{"),
 		p.OptWhitespaceSurround(
 			p.Ref("selection_fields"),

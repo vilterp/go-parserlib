@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+
+	pp "github.com/vilterp/go-pretty-print"
 )
 
 type RuleID int
@@ -11,7 +13,6 @@ type RuleID int
 type Grammar struct {
 	rules map[string]Rule
 
-	idForRule  map[Rule]RuleID
 	ruleForID  map[RuleID]Rule
 	nameForID  map[RuleID]string
 	nextRuleID RuleID
@@ -20,7 +21,6 @@ type Grammar struct {
 func NewGrammar(rules map[string]Rule) (*Grammar, error) {
 	g := &Grammar{
 		rules:     rules,
-		idForRule: make(map[Rule]RuleID),
 		ruleForID: make(map[RuleID]Rule),
 		nameForID: make(map[RuleID]string),
 		// prevent zero value from accidentally making things work that shouldn't
@@ -38,7 +38,6 @@ func NewGrammar(rules map[string]Rule) (*Grammar, error) {
 
 func (g *Grammar) assignRuleIDs(r Rule) RuleID {
 	id := g.nextRuleID
-	g.idForRule[r] = id
 	g.ruleForID[id] = r
 	g.nextRuleID++
 	for _, child := range r.Children() {
@@ -56,12 +55,12 @@ func (g *Grammar) validate() error {
 	return nil
 }
 
-func (g *Grammar) String() string {
-	var rulesStrings []string
+func (g *Grammar) Format() pp.Doc {
+	var ruleDocs []pp.Doc
 	for name, rule := range g.rules {
-		rulesStrings = append(rulesStrings, fmt.Sprintf("%s: %s", name, rule))
+		ruleDocs = append(ruleDocs, pp.Textf("%s: %s", name, rule.String()))
 	}
-	return strings.Join(rulesStrings, "\n")
+	return pp.Join(ruleDocs, pp.Newline)
 }
 
 func (g *Grammar) NameForID(id RuleID) string {
