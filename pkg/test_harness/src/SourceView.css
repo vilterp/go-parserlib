@@ -1,0 +1,17 @@
+.source-view {
+  font-family: monospace;
+}
+
+.source-span {
+  cursor: pointer;
+}
+
+.source-span.highlighted {
+  background: #e6e6e6;
+}
+
+.cursor {
+  display: inline;
+  height: 20px;
+  border-left: 1px solid red;
+}
