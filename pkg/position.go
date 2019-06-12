@@ -53,3 +53,7 @@ type SourceSpan struct {
 func (ss SourceSpan) Length() int {
 	return ss.To.Offset - ss.From.Offset
 }
+
+func (ss SourceSpan) String() string {
+	return fmt.Sprintf("[%s - %s]", ss.From.CompactString(), ss.To.CompactString())
+}

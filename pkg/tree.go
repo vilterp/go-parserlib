@@ -8,8 +8,7 @@ import (
 
 type Node struct {
 	Name     string
-	StartPos Position
-	EndPos   Position
+	Span     SourceSpan
 	Children []*Node
 }
 
@@ -20,9 +19,12 @@ func (tt *TraceTree) ToTree() *Node {
 	case *ref:
 		name = tRule.name
 		return &Node{
-			Name:     name,
-			StartPos: tt.StartPos,
-			EndPos:   tt.EndPos,
+			Name: name,
+			// TODO(vilterp): use SourceSpan in TraceTree too?
+			Span: SourceSpan{
+				From: tt.StartPos,
+				To:   tt.EndPos,
+			},
 			Children: tt.RefTrace.getChildren(),
 		}
 	default:
@@ -62,7 +64,7 @@ func (n *Node) Format() pp.Doc {
 	}
 	var docs = []pp.Doc{
 		pp.Text(n.Name),
-		pp.Textf(" [%v - %v]", n.StartPos.CompactString(), n.EndPos.CompactString()),
+		pp.Textf(" %s", n.Span.String()),
 	}
 	if len(n.Children) > 0 {
 		docs = append(
