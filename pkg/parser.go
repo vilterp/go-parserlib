@@ -3,6 +3,8 @@ package parserlib
 import (
 	"fmt"
 	"strings"
+
+	"github.com/vilterp/go-parserlib/pkg/logger"
 )
 
 // TODO: structured parse errors
@@ -12,12 +14,11 @@ import (
 
 type ParserState struct {
 	grammar *Grammar
+	input   string
+	stack   []*ParserStackFrame
+	trace   *TraceTree
 
-	input string
-
-	stack []*ParserStackFrame
-
-	trace *TraceTree
+	logger logger.Logger
 }
 
 type ParserStackFrame struct {
@@ -29,10 +30,14 @@ type ParserStackFrame struct {
 	rule Rule
 }
 
-func (g *Grammar) Parse(startRuleName string, input string, cursor int) (*TraceTree, error) {
+func (g *Grammar) Parse(startRuleName string, input string, cursor int, log logger.Logger) (*TraceTree, error) {
+	if log == nil {
+		log = logger.NewNoopLogger()
+	}
 	ps := ParserState{
 		grammar: g,
 		input:   input,
+		logger:  log,
 	}
 	initPos := Position{Line: 1, Col: 1, Offset: 0}
 	startRule, ok := ps.grammar.rules[startRuleName]
@@ -57,10 +62,12 @@ func (ps *ParserState) callRule(rule Rule, pos Position, cursor int) (*TraceTree
 		pos:   pos,
 	}
 	ps.stack = append(ps.stack, stackFrame)
+	ps.logger.Indent()
 	// Run the rule.
 	traceTree, err := ps.runRule(cursor)
 	// Pop the stack frame.
 	ps.stack = ps.stack[:len(ps.stack)-1]
+	ps.logger.Outdent()
 	if traceTree == nil {
 		panic(fmt.Sprintf("nil trace tree returned for rule %v", rule))
 	}
@@ -104,15 +111,22 @@ func (ps *ParserState) runRule(cursor int) (*TraceTree, *ParseError) {
 		maxAdvancement := 0
 		maxAdvancementTraceIndex := 0
 		var maxAdvancementTrace *TraceTree
+		ps.logger.Log("CHOICE:", rule.String())
+		ps.logger.Indent()
+		defer ps.logger.Outdent()
 		for choiceIdx, choice := range tRule.choices {
+			ps.logger.Logf("trying choice %d", choiceIdx)
 			choiceTrace, err := ps.callRule(choice, frame.pos, cursor)
 			advancement := choiceTrace.EndPos.Offset - choiceTrace.StartPos.Offset
+			ps.logger.Logf("choice %d advanced %d", choiceIdx, advancement)
 			if advancement >= maxAdvancement {
 				maxAdvancement = advancement
 				maxAdvancementTrace = choiceTrace
 				maxAdvancementTraceIndex = choiceIdx
+				ps.logger.Logf("max advancement now %d", maxAdvancement)
 			}
 			if err == nil {
+				ps.logger.Logf("choice %d is a match: %s", choiceIdx, tRule.choices[choiceIdx].String())
 				// We found a match!
 				trace.EndPos = choiceTrace.EndPos
 				trace.ChoiceIdx = choiceIdx
@@ -123,6 +137,10 @@ func (ps *ParserState) runRule(cursor int) (*TraceTree, *ParseError) {
 		trace.EndPos = maxAdvancementTrace.EndPos
 		trace.ChoiceIdx = maxAdvancementTraceIndex
 		trace.ChoiceTrace = maxAdvancementTrace
+		ps.logger.Logf(
+			"err; going with max advancement trace %d: %s",
+			maxAdvancementTraceIndex, tRule.choices[maxAdvancementTraceIndex].String(),
+		)
 		return trace, frame.Errorf(nil, "no match for rule `%s`", rule.String())
 	case *sequence:
 		trace := &TraceTree{
@@ -137,12 +155,17 @@ func (ps *ParserState) runRule(cursor int) (*TraceTree, *ParseError) {
 		// ---  ---  ---  ---
 		//   3
 		//            ^
+		ps.logger.Log("SEQ:", rule.String())
+		ps.logger.Indent()
+		defer ps.logger.Outdent()
 		for itemIdx, item := range tRule.items {
+			ps.logger.Logf("item %d", itemIdx)
 			trace.AtItemIdx = itemIdx
 			itemTrace, err := ps.callRule(item, frame.pos, cursor-advancement)
 			advancement += itemTrace.GetSpan().Length()
 			trace.EndPos = itemTrace.EndPos
 			trace.ItemTraces[itemIdx] = itemTrace
+			ps.logger.Logf("got to %d %+v advanced %d", itemIdx, trace.EndPos, advancement)
 			if err != nil {
 				return trace, frame.Errorf(err, "no match for sequence item %d", itemIdx)
 			}
@@ -151,6 +174,7 @@ func (ps *ParserState) runRule(cursor int) (*TraceTree, *ParseError) {
 		trace.EndPos = frame.pos
 		return trace, nil
 	case *keyword:
+		ps.logger.Log("KEYWORD:", tRule.value)
 		remainingInput := ps.input[frame.pos.Offset:]
 		if len(tRule.value) > len(remainingInput) {
 			trimmed := strings.TrimPrefix(tRule.value, remainingInput)
@@ -170,6 +194,7 @@ func (ps *ParserState) runRule(cursor int) (*TraceTree, *ParseError) {
 		}
 		return minimalTrace, frame.Errorf(nil, `expected "%s"; got "%s"`, tRule.value, remainingInput)
 	case *ref:
+		ps.logger.Log("REF:", tRule.name)
 		refRule, ok := ps.grammar.rules[tRule.name]
 		if !ok {
 			panic(fmt.Sprintf("nonexistent rule slipped through validation: %s", tRule.name))
@@ -189,6 +214,7 @@ func (ps *ParserState) runRule(cursor int) (*TraceTree, *ParseError) {
 			RefTrace:  refTrace,
 		}, nil
 	case *regex:
+		ps.logger.Log("REGEX:", tRule.regex)
 		loc := tRule.regex.FindStringIndex(ps.input[frame.pos.Offset:])
 		if loc == nil || loc[0] != 0 {
 			return minimalTrace, frame.Errorf(nil, "no match found for regex %s", tRule.regex)
@@ -210,27 +236,10 @@ func (ps *ParserState) runRule(cursor int) (*TraceTree, *ParseError) {
 			EndPos:     endPos,
 			RegexMatch: matchText,
 		}, nil
-	case *mapper:
-		innerTrace, err := ps.callRule(tRule.innerRule, frame.pos, cursor)
-		minimalTrace.InnerTrace = innerTrace
-		minimalTrace.EndPos = innerTrace.EndPos
-		if err != nil {
-			return minimalTrace, err
-		}
-		res := tRule.fun(innerTrace)
-		minimalTrace.MapRes = res
-		return minimalTrace, nil
 	case *succeed:
 		minimalTrace.Success = true
 		return minimalTrace, nil
 	default:
 		panic(fmt.Sprintf("not implemented: %T", rule))
 	}
-}
-
-func max(x, y int64) int64 {
-	if x > y {
-		return x
-	}
-	return y
 }

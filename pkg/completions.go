@@ -24,10 +24,6 @@ func (tt *TraceTree) GetCompletions() ([]string, error) {
 	}
 }
 
-func (m *mapper) Completions(g *Grammar, cursor int) []string {
-	return m.innerRule.Completions(g, cursor)
-}
-
 func (c *choice) Completions(g *Grammar, cursor int) []string {
 	var out []string
 	for _, choice := range c.choices {

@@ -1,11 +1,22 @@
 package treesql
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/vilterp/go-parserlib/pkg/logger"
+)
 
 func TestTreeSQL(t *testing.T) {
-	tree, err := Grammar.Parse("select", "MANY posts { id }", 0)
-	if err != nil {
-		t.Fatal(t)
+	queries := []string{
+		//"MANY posts { id }",
+		//"MANY posts { id, comments: ",
+		"MANY posts { id, comments: MANY",
 	}
-	t.Log(tree.Format())
+
+	for i, query := range queries {
+		trace, err := Grammar.Parse("select", query, 0, logger.NewStdoutLogger())
+		if err != nil {
+			t.Fatalf("case %d: %v\n\n%v", i, err, trace.Format())
+		}
+	}
 }

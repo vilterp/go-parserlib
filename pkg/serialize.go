@@ -32,13 +32,6 @@ func (g *Grammar) Serialize() *SerializedGrammar {
 	return sg
 }
 
-func (m *mapper) Serialize(g *Grammar) SerializedRule {
-	return SerializedRule{
-		RuleType:  "MAP",
-		InnerRule: g.idForRule[m.innerRule],
-	}
-}
-
 func (c *choice) Serialize(g *Grammar) SerializedRule {
 	choices := make([]RuleID, len(c.choices))
 	for idx, choice := range c.choices {

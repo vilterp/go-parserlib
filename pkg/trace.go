@@ -69,14 +69,6 @@ func (tt *TraceTree) Format() pp.Doc {
 		})
 	case *keyword:
 		return pp.Textf("%#v", tRule.value)
-	case *mapper:
-		return pp.Seq([]pp.Doc{
-			pp.Text("MAP("),
-			pp.Newline,
-			pp.Indent(2, tt.InnerTrace.Format()),
-			pp.Newline,
-			pp.Text(")"),
-		})
 	default:
 		panic(fmt.Sprintf("don't know how to format a %T trace", rule))
 	}
