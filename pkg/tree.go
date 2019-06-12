@@ -20,6 +20,7 @@ func (tt *TraceTree) ToTree(name string) *Node {
 		StartPos: tt.StartPos,
 		EndPos:   tt.EndPos,
 	}
+	return n
 	switch tRule := rule.(type) {
 	case *ref:
 		name = tRule.name
