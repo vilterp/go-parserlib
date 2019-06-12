@@ -40,9 +40,8 @@ func (g *Grammar) Parse(startRuleName string, input string, cursor int, log logg
 		logger:  log,
 	}
 	initPos := Position{Line: 1, Col: 1, Offset: 0}
-	startRule, ok := ps.grammar.rules[startRuleName]
-	if !ok {
-		return nil, fmt.Errorf("nonexistent start rule: %s", startRuleName)
+	startRule := &ref{
+		name: startRuleName,
 	}
 	traceTree, err := ps.callRule(startRule, initPos, cursor)
 	if err != nil {
@@ -95,7 +94,7 @@ func (ps *ParserState) runRule(cursor int) (*TraceTree, *ParseError) {
 	startPos := frame.pos
 	minimalTrace := &TraceTree{
 		grammar:   ps.grammar,
-		RuleID:    ps.grammar.idForRule[rule],
+		Rule:      rule,
 		StartPos:  startPos,
 		CursorPos: 0,
 		EndPos:    startPos,
@@ -104,7 +103,7 @@ func (ps *ParserState) runRule(cursor int) (*TraceTree, *ParseError) {
 	case *choice:
 		trace := &TraceTree{
 			grammar:   ps.grammar,
-			RuleID:    ps.grammar.idForRule[rule],
+			Rule:      rule,
 			StartPos:  startPos,
 			CursorPos: cursor,
 		}
@@ -145,7 +144,7 @@ func (ps *ParserState) runRule(cursor int) (*TraceTree, *ParseError) {
 	case *sequence:
 		trace := &TraceTree{
 			grammar:    ps.grammar,
-			RuleID:     ps.grammar.idForRule[rule],
+			Rule:       rule,
 			StartPos:   startPos,
 			CursorPos:  cursor,
 			ItemTraces: make([]*TraceTree, len(tRule.items)),
@@ -208,7 +207,7 @@ func (ps *ParserState) runRule(cursor int) (*TraceTree, *ParseError) {
 		}
 		return &TraceTree{
 			grammar:   ps.grammar,
-			RuleID:    ps.grammar.idForRule[rule],
+			Rule:      rule,
 			StartPos:  startPos,
 			CursorPos: cursor,
 			EndPos:    refTrace.EndPos,
@@ -231,7 +230,7 @@ func (ps *ParserState) runRule(cursor int) (*TraceTree, *ParseError) {
 		}
 		return &TraceTree{
 			grammar:    ps.grammar,
-			RuleID:     ps.grammar.idForRule[rule],
+			Rule:       rule,
 			StartPos:   startPos,
 			CursorPos:  cursor,
 			EndPos:     endPos,

@@ -20,8 +20,12 @@ func TestTreeSQL(t *testing.T) {
 			`MANY posts {
   id
 }`,
-			`select [1:1 - 1:18]
-         table_name`,
+			`select [1:1 - 3:2]
+  table_name [1:6 - 1:11]
+  selections [1:12 - 3:2]
+    selection_fields [2:3 - 2:5]
+      selection_field [2:3 - 2:5]
+        column_name [2:3 - 2:5]`,
 			``,
 		},
 		{
@@ -29,19 +33,44 @@ func TestTreeSQL(t *testing.T) {
   id,
   title
 }`,
-			`select [1:1 - 1:18]
-         table_name`,
+			`select [1:1 - 4:2]
+  table_name [1:6 - 1:11]
+  selections [1:12 - 4:2]
+    selection_fields [2:3 - 3:8]
+      selection_field [2:3 - 2:5]
+        column_name [2:3 - 2:5]
+      selection_fields [3:3 - 3:8]
+        selection_field [3:3 - 3:8]
+          column_name [3:3 - 3:8]`,
 			``,
 		},
 		{
 			`MANY posts { id, comments: `,
-			``,
-			``,
+			`select [1:1 - 1:28]
+  table_name [1:6 - 1:11]
+  selections [1:12 - 1:28]
+    selection_fields [1:14 - 1:28]
+      selection_field [1:14 - 1:16]
+        column_name [1:14 - 1:16]
+      selection_fields [1:18 - 1:28]
+        selection_field [1:18 - 1:28]
+          column_name [1:18 - 1:26]
+          select [1:28 - 1:28]`,
+			"1:1: no match for rule \"select\": 1:12: no match for sequence item 6: 1:12: no match for rule \"selections\": 1:13: no match for sequence item 1: 1:14: no match for sequence item 1: 1:14: no match for rule \"selection_fields\": 1:14: no match for rule `(([selection_field, [\",\", (/\\s+/ | <succeed>)], selection_fields] | selection_field) | <succeed>)`",
 		},
 		{
 			`MANY posts { id, comments: MANY`,
-			``,
-			``,
+			`select [1:1 - 1:32]
+  table_name [1:6 - 1:11]
+  selections [1:12 - 1:32]
+    selection_fields [1:14 - 1:32]
+      selection_field [1:14 - 1:16]
+        column_name [1:14 - 1:16]
+      selection_fields [1:18 - 1:32]
+        selection_field [1:18 - 1:32]
+          column_name [1:18 - 1:26]
+          select [1:28 - 1:32]`,
+			"1:1: no match for rule \"select\": 1:12: no match for sequence item 6: 1:12: no match for rule \"selections\": 1:13: no match for sequence item 1: 1:14: no match for sequence item 1: 1:14: no match for rule \"selection_fields\": 1:14: no match for rule `(([selection_field, [\",\", (/\\s+/ | <succeed>)], selection_fields] | selection_field) | <succeed>)`",
 		},
 	}
 

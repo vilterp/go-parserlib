@@ -1,7 +1,7 @@
 package parserlib
 
 func (tt *TraceTree) GetCompletions() ([]string, error) {
-	rule := tt.grammar.ruleForID[tt.RuleID]
+	rule := tt.Rule
 	switch tRule := rule.(type) {
 	case *choice:
 		// TODO: we sometimes want to return multiple choices here...

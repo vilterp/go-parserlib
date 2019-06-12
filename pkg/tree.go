@@ -14,7 +14,7 @@ type Node struct {
 }
 
 func (tt *TraceTree) ToTree() *Node {
-	rule := tt.grammar.ruleForID[tt.RuleID]
+	rule := tt.Rule
 	name := ""
 	switch tRule := rule.(type) {
 	case *ref:
@@ -26,18 +26,7 @@ func (tt *TraceTree) ToTree() *Node {
 			Children: tt.RefTrace.getChildren(),
 		}
 	default:
-		// TODO(vilterp): this is janky.
-		//   needs some kind of refactoring; I'm not sure what
-		name, ok := tt.grammar.nameForID[tt.RuleID]
-		if !ok {
-			panic(fmt.Sprintf("name not found for rule %s", rule.String()))
-		}
-		return &Node{
-			Name:     name,
-			StartPos: tt.StartPos,
-			EndPos:   tt.EndPos,
-			Children: tt.getChildren(),
-		}
+		panic(fmt.Sprintf("only should on Ref, not %T", rule))
 	}
 }
 
@@ -60,7 +49,7 @@ func (tt *TraceTree) getChildren() []*Node {
 	} else if tt.Success {
 		return nil
 	} else if tt.RefTrace != nil {
-		return []*Node{tt.RefTrace.ToTree()}
+		return []*Node{tt.ToTree()}
 	} else {
 		return nil
 	}
