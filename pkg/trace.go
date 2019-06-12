@@ -9,7 +9,7 @@ import (
 type TraceTree struct {
 	grammar *Grammar
 
-	RuleID    RuleID
+	Rule      Rule
 	StartPos  Position
 	CursorPos int // cursor offset relative to StartPos
 	EndPos    Position
@@ -31,7 +31,7 @@ type TraceTree struct {
 }
 
 func (tt *TraceTree) Format() pp.Doc {
-	rule := tt.grammar.ruleForID[tt.RuleID]
+	rule := tt.Rule
 
 	switch tRule := rule.(type) {
 	case *choice:
