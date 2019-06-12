@@ -8,8 +8,8 @@ import (
 
 func TestTreeSQL(t *testing.T) {
 	queries := []string{
-		//"MANY posts { id }",
-		//"MANY posts { id, comments: ",
+		"MANY posts { id }",
+		"MANY posts { id, comments: ",
 		"MANY posts { id, comments: MANY",
 	}
 

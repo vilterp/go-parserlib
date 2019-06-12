@@ -124,14 +124,14 @@ func (ps *ParserState) runRule(cursor int) (*TraceTree, *ParseError) {
 				maxAdvancementTrace = choiceTrace
 				maxAdvancementTraceIndex = choiceIdx
 				ps.logger.Logf("max advancement now %d", maxAdvancement)
-			}
-			if err == nil {
-				ps.logger.Logf("choice %d is a match: %s", choiceIdx, tRule.choices[choiceIdx].String())
-				// We found a match!
-				trace.EndPos = choiceTrace.EndPos
-				trace.ChoiceIdx = choiceIdx
-				trace.ChoiceTrace = choiceTrace
-				return trace, nil
+				if err == nil {
+					ps.logger.Logf("choice %d is a match: %s", choiceIdx, tRule.choices[choiceIdx].String())
+					// We found a match!
+					trace.EndPos = choiceTrace.EndPos
+					trace.ChoiceIdx = choiceIdx
+					trace.ChoiceTrace = choiceTrace
+					return trace, nil
+				}
 			}
 		}
 		trace.EndPos = maxAdvancementTrace.EndPos
