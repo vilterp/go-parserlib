@@ -6,6 +6,7 @@ import (
 
 type Path struct {
 	Nodes    []Node
+	NodeName string
 	AttrName string
 	AttrText *parserlib.TextNode
 }
@@ -24,6 +25,7 @@ func getPathRecurse(node Node, nodes []Node, pos parserlib.Position) *Path {
 	for name, attr := range attrs {
 		if attr.Span.Contains(pos) {
 			return &Path{
+				NodeName: node.TypeName(),
 				AttrName: name,
 				AttrText: attr,
 				Nodes:    nodes,

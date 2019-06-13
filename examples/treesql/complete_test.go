@@ -17,6 +17,7 @@ type completionTestCase struct {
 
 func TestComplete(t *testing.T) {
 	cases := []completionTestCase{
+		// table names
 		{
 			`MANY po {}`,
 			parserlib.Position{Line: 1, Col: 7, Offset: 6},
@@ -30,6 +31,12 @@ func TestComplete(t *testing.T) {
 }`,
 			parserlib.Position{Line: 3, Col: 20, Offset: 38},
 			psi.Completions{"comments"},
+		},
+		// column names
+		{
+			`MANY posts { i }`,
+			parserlib.Position{Line: 1, Col: 15, Offset: 14},
+			psi.Completions{"id"},
 		},
 	}
 
