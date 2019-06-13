@@ -13,27 +13,6 @@ type annotateTestCase struct {
 	errors []string
 }
 
-var blogSchema = &treesql.SchemaDesc{
-	Tables: map[string]*treesql.TableDesc{
-		"posts": {
-			Columns: map[string]*treesql.ColDesc{
-				"id":    {},
-				"body":  {},
-				"title": {},
-				// vv here so that both have a col that starts with p
-				"pics": {},
-			},
-		},
-		"comments": {
-			Columns: map[string]*treesql.ColDesc{
-				"id":      {},
-				"body":    {},
-				"post_id": {},
-			},
-		},
-	},
-}
-
 func TestAnnotate(t *testing.T) {
 	cases := []annotateTestCase{
 		{
@@ -60,7 +39,7 @@ func TestAnnotate(t *testing.T) {
 			tree := traceTree.ToTree()
 			selectPsi := treesql.ToSelect(tree)
 
-			errors := treesql.Annotate(blogSchema, selectPsi)
+			errors := treesql.Annotate(treesql.BlogSchema, selectPsi)
 			var errorStrings []string
 			for _, err := range errors {
 				errorStrings = append(errorStrings, err.String())

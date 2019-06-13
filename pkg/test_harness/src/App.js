@@ -19,7 +19,8 @@ class App extends Component {
       query: INITIAL_QUERY,
       cursorPos: 0,
       grammar: null,
-      trace: null,
+
+      resp: null,
 
       highlightedRuleID: null,
       highlightedSpan: null,
@@ -33,7 +34,7 @@ class App extends Component {
   }
 
   fetchGrammar() {
-    fetch("http://localhost:9999/grammar").then((resp) => {
+    fetch("/grammar").then((resp) => {
       resp.json().then((grammar) => {
         console.log("grammar:", grammar);
         this.setState({
@@ -50,14 +51,14 @@ class App extends Component {
       Input: query,
       CursorPos: pos,
     };
-    fetch("http://localhost:9999/completions", {
+    fetch("/completions", {
       method: "POST",
       body: JSON.stringify(completionReq),
     }).then((resp) => {
       resp.json().then((completionResp) => {
         console.log("trace:", completionResp);
         this.setState({
-          trace: completionResp,
+          resp: completionResp,
         });
       }).catch((err) => {
         console.error("error parsing completions:", err);
@@ -112,18 +113,18 @@ class App extends Component {
             />
             <br />
             Pos: {this.state.cursorPos}<br />
-            {this.state.trace && this.state.trace.Completions
+            {this.state.resp && this.state.resp.Completions
               ? <ul>
-                  {this.state.trace.Completions.map((completion) => (
-                    <li key={completion}>{completion}</li>
+                  {this.state.resp.Completions.map((completion) => (
+                    <li key={completion.Content}>{completion.Kind}: {completion.Content}</li>
                   ))}
                 </ul>
               : null}
           </div>
           <div className="grid-cell app-sourceview">
-            {this.state.trace && this.state.grammar
+            {this.state.resp && this.state.grammar
               ? <SourceView
-                  trace={this.state.trace.Trace}
+                  trace={this.state.resp.TraceTree}
                   grammar={this.state.grammar}
                   {...highlightProps}
                 />
@@ -131,10 +132,10 @@ class App extends Component {
           </div>
           <div className="grid-cell app-traceview">
             <h3>Trace</h3>
-            {this.state.trace && this.state.grammar
+            {this.state.resp && this.state.grammar
               ? <TraceView
-                  trace={this.state.trace.Trace}
-                  error={this.state.trace.Err}
+                  trace={this.state.resp.TraceTree}
+                  error={this.state.resp.Err}
                   grammar={this.state.grammar}
                   {...highlightProps}
                 />

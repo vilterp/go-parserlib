@@ -15,6 +15,16 @@ type selectTestCase struct {
 
 func TestToSelect(t *testing.T) {
 	cases := []selectTestCase{
+		// partial queries
+		{
+			``,
+			``,
+		},
+		{
+			`MANY `,
+			``,
+		},
+		// full query
 		{
 			`MANY posts {
 	 id,

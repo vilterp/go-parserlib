@@ -51,7 +51,7 @@ func TestComplete(t *testing.T) {
 			tree := traceTree.ToTree()
 			sel := treesql.ToSelect(tree)
 
-			actual := treesql.Complete(sel, blogSchema, testCase.cursorPos)
+			actual := treesql.Complete(sel, treesql.BlogSchema, testCase.cursorPos)
 			expected := strings.Join(testCase.completions, "\n")
 			if actual.String() != expected {
 				t.Fatalf("EXPECTED\n\n%v\n\nGOT\n\n%v", expected, actual.String())

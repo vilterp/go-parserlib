@@ -8,6 +8,7 @@ import (
 	"time"
 
 	parserlib "github.com/vilterp/go-parserlib/pkg"
+	"github.com/vilterp/go-parserlib/pkg/psi"
 )
 
 type completionsRequest struct {
@@ -16,23 +17,25 @@ type completionsRequest struct {
 }
 
 type completionsResponse struct {
-	Trace *parserlib.TraceTree
-	//PSITree     *parserlib.SerializedPSINode
-	Completions []string
-	Err         string
+	TraceTree        *parserlib.TraceTree
+	RuleTree         *parserlib.Node
+	PSITree          psi.Node
+	Completions      psi.Completions
+	ErrorAnnotations []*psi.ErrorAnnotation
+	Err              string
 }
 
 // TODO: use some logging middleware
 // which prints statuses, urls, and times
 
 type server struct {
-	grammar           *parserlib.Grammar
+	language          *psi.Language
 	serializedGrammar *parserlib.SerializedGrammar
 
 	mux *http.ServeMux
 }
 
-func NewServer(g *parserlib.Grammar) *server {
+func NewServer(l *psi.Language) *server {
 	mux := http.NewServeMux()
 
 	// Serve UI static files.
@@ -45,8 +48,8 @@ func NewServer(g *parserlib.Grammar) *server {
 	mux.Handle("/static/", http.StripPrefix("/static/", fileServer))
 
 	server := &server{
-		grammar:           g,
-		serializedGrammar: g.Serialize(),
+		language:          l,
+		serializedGrammar: l.Grammar.Serialize(),
 		mux:               mux,
 	}
 
@@ -90,24 +93,7 @@ func (s *server) handleCompletions(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var resp completionsResponse
-
-	// Parse it.
-	trace, err := s.grammar.Parse("select", cr.Input, cr.CursorPos, nil)
-	resp.Trace = trace
-	if err != nil {
-		resp.Err = err.Error()
-		log.Println("/completions parse error: ", err.Error())
-	}
-	if trace != nil {
-		// Get completions.
-		completions, err := trace.GetCompletions()
-		if err != nil {
-			resp.Err = err.Error()
-			log.Println("/completions completions error: ", err.Error())
-		}
-		resp.Completions = completions
-	}
+	resp, err := s.getResp(&cr)
 
 	// Respond.
 	if err := json.NewEncoder(w).Encode(&resp); err != nil {
@@ -117,4 +103,53 @@ func (s *server) handleCompletions(w http.ResponseWriter, r *http.Request) {
 
 	end := time.Now()
 	log.Println("/completions responded in", end.Sub(start))
+}
+
+func (s *server) getResp(req *completionsRequest) (*completionsResponse, error) {
+	resp := &completionsResponse{}
+
+	// Parse it.
+	trace, err := s.language.Grammar.Parse("select", req.Input, req.CursorPos, nil)
+	resp.TraceTree = trace
+	if err != nil {
+		resp.Err = err.Error()
+		log.Println("/completions parse error: ", err.Error())
+	}
+
+	// Get completions.
+	syntaxCompletions, err := trace.GetCompletions()
+	if err != nil {
+		resp.Err = err.Error()
+	}
+	resp.Completions = append(resp.Completions, makeSyntaxCompletions(syntaxCompletions)...)
+
+	// Get rule tree.
+	resp.RuleTree = trace.ToTree()
+
+	// Get PSI tree.
+	resp.PSITree = s.language.Extract(resp.RuleTree)
+	resp.ErrorAnnotations = s.language.AnnotateErrors(resp.PSITree)
+	// TODO(vilterp): get position from cursor offset
+	cursorPos := parserlib.Position{
+		Line:   1,
+		Col:    1,
+		Offset: 0,
+	}
+	resp.Completions = append(
+		resp.Completions,
+		s.language.Complete(resp.PSITree, cursorPos)...,
+	)
+
+	return resp, nil
+}
+
+func makeSyntaxCompletions(cs []string) psi.Completions {
+	var out psi.Completions
+	for _, c := range cs {
+		out = append(out, &psi.Completion{
+			Kind:    "syntax",
+			Content: c,
+		})
+	}
+	return out
 }
