@@ -25,14 +25,14 @@ func TestToSelect(t *testing.T) {
      body
 	 }
 	}`,
-			`Select <many: true, table_name: "posts"@[1:6 - 1:11]>
-  Selection <name: "id"@[2:3 - 2:5]>
-  Selection <name: "title"@[3:4 - 3:9]>
-  Selection <name: "body"@[4:4 - 4:8]>
-  Selection <name: "comments"@[5:3 - 5:11]>
-    Select <many: true, table_name: "comments"@[5:18 - 5:26]>
-      Selection <name: "id"@[6:5 - 6:7]>
-      Selection <name: "body"@[7:6 - 7:10]>`,
+			`Select <many: true, table_name: "posts"@[1:6 - 1:11]> [1:1 - 9:3]
+  Selection <name: "id"@[2:3 - 2:5]> [2:3 - 2:5]
+  Selection <name: "title"@[3:4 - 3:9]> [3:4 - 3:9]
+  Selection <name: "body"@[4:4 - 4:8]> [4:4 - 4:8]
+  Selection <name: "comments"@[5:3 - 5:11]> [5:3 - 8:4]
+    Select <many: true, table_name: "comments"@[5:18 - 5:26]> [5:13 - 8:4]
+      Selection <name: "id"@[6:5 - 6:7]> [6:5 - 6:7]
+      Selection <name: "body"@[7:6 - 7:10]> [7:6 - 7:10]`,
 		},
 	}
 

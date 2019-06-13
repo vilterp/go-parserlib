@@ -4,19 +4,21 @@ import (
 	"fmt"
 
 	parserlib "github.com/vilterp/go-parserlib/pkg"
+	"github.com/vilterp/go-parserlib/pkg/psi"
 )
 
-func ToSelect(t *parserlib.Node) *Select {
-	if t.Name != "select" {
-		panic(fmt.Sprintf("expecting `select` got %s", t.Name))
+func ToSelect(n *parserlib.Node) *Select {
+	if n.Name != "select" {
+		panic(fmt.Sprintf("expecting `select` got %s", n.Name))
 	}
 
-	tn := t.MustGetChildWithName("table_name")
-	selectionFieldsNode := t.
+	tn := n.MustGetChildWithName("table_name")
+	selectionFieldsNode := n.
 		MustGetChildWithName("selections").
 		MustGetChildWithName("selection_fields")
 
 	return &Select{
+		BaseNode:   psi.BaseNode{Span: n.Span},
 		Many:       true, // TODO: guess I have to name this in the grammar
 		TableName:  tn.Text(),
 		Selections: getSubSelections(selectionFieldsNode),
@@ -49,7 +51,8 @@ func getSelection(n *parserlib.Node) *Selection {
 	}
 	columnName := n.MustGetChildWithName("column_name")
 	out := &Selection{
-		Name: columnName.Text(),
+		BaseNode: psi.BaseNode{Span: n.Span},
+		Name:     columnName.Text(),
 	}
 	selects := n.GetChildrenWithName("select")
 	if len(selects) == 1 {

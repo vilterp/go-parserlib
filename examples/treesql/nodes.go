@@ -10,6 +10,7 @@ import (
 // can do completion on this representation
 // and annotate it with errors
 type Select struct {
+	psi.BaseNode
 	Many       bool
 	TableName  *parserlib.TextNode
 	Selections []*Selection
@@ -43,6 +44,7 @@ func (s *Select) AttrNodes() map[string]*parserlib.TextNode {
 }
 
 type Selection struct {
+	psi.BaseNode
 	Name      *parserlib.TextNode
 	SubSelect *Select
 }

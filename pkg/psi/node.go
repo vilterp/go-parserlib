@@ -7,7 +7,16 @@ import (
 	pp "github.com/vilterp/go-pretty-print"
 )
 
+type BaseNode struct {
+	Span parserlib.SourceSpan
+}
+
+func (b *BaseNode) SourceSpan() parserlib.SourceSpan {
+	return b.Span
+}
+
 type Node interface {
+	SourceSpan() parserlib.SourceSpan
 	TypeName() string
 	Children() []Node
 	// general attributes
@@ -57,6 +66,8 @@ func Format(n Node) pp.Doc {
 		pp.Text(" <"),
 		pp.Join(attrDocs, pp.CommaSpace),
 		pp.Text(">"),
+		pp.Text(" "),
+		pp.Text(n.SourceSpan().String()),
 	})
 
 	if len(childDocs) == 0 {

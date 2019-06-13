@@ -7,3 +7,8 @@ type Completion struct {
 	Pos  parserlib.Position
 	Text string
 }
+
+// top to bottom
+func GetPath(node Node, pos parserlib.Position) []Node {
+	return nil
+}
