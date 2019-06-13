@@ -20,6 +20,8 @@ var blogSchema = &treesql.SchemaDesc{
 				"id":    {},
 				"body":  {},
 				"title": {},
+				// vv here so that both have a col that starts with p
+				"pics": {},
 			},
 		},
 		"comments": {
