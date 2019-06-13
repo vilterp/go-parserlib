@@ -2,17 +2,17 @@ package treesql_test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/vilterp/go-parserlib/examples/treesql"
 	parserlib "github.com/vilterp/go-parserlib/pkg"
-	"github.com/vilterp/go-parserlib/pkg/psi"
 )
 
 type completionTestCase struct {
 	input       string
 	cursorPos   parserlib.Position
-	completions psi.Completions
+	completions []string
 }
 
 func TestComplete(t *testing.T) {
@@ -21,7 +21,7 @@ func TestComplete(t *testing.T) {
 		{
 			`MANY po {}`,
 			parserlib.Position{Line: 1, Col: 7, Offset: 6},
-			psi.Completions{"posts"},
+			[]string{"table: posts"},
 		},
 		{
 			`MANY posts {
@@ -30,18 +30,18 @@ func TestComplete(t *testing.T) {
   }
 }`,
 			parserlib.Position{Line: 3, Col: 20, Offset: 38},
-			psi.Completions{"comments"},
+			[]string{"table: comments"},
 		},
 		// column names
 		{
 			`MANY posts { p }`,
 			parserlib.Position{Line: 1, Col: 15, Offset: 14},
-			psi.Completions{"pics"},
+			[]string{"column: pics"},
 		},
 		{
 			`MANY comments { p }`,
 			parserlib.Position{Line: 1, Col: 18, Offset: 17},
-			psi.Completions{"post_id"},
+			[]string{"column: post_id"},
 		},
 	}
 
@@ -51,9 +51,10 @@ func TestComplete(t *testing.T) {
 			tree := traceTree.ToTree()
 			sel := treesql.ToSelect(tree)
 
-			completions := treesql.Complete(sel, blogSchema, testCase.cursorPos)
-			if completions.String() != testCase.completions.String() {
-				t.Fatalf("EXPECTED\n\n%v\n\nGOT\n\n%v", testCase.completions.String(), completions.String())
+			actual := treesql.Complete(sel, blogSchema, testCase.cursorPos)
+			expected := strings.Join(testCase.completions, "\n")
+			if actual.String() != expected {
+				t.Fatalf("EXPECTED\n\n%v\n\nGOT\n\n%v", expected, actual.String())
 			}
 		})
 	}

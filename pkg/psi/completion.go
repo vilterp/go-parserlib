@@ -1,21 +1,25 @@
 package psi
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
-//type Completion struct {
-//	// TODO(vilterp): how does this represent completion partway into a token?
-//	Pos  parserlib.Position
-//	Text string
-//}
+type Completion struct {
+	Kind    string
+	Content string
+}
 
-type Completion string
+func (c *Completion) String() string {
+	return fmt.Sprintf("%s: %s", c.Kind, c.Content)
+}
 
-type Completions []Completion
+type Completions []*Completion
 
 func (c Completions) String() string {
 	var lines []string
 	for _, line := range c {
-		lines = append(lines, string(line))
+		lines = append(lines, line.String())
 	}
 	return strings.Join(lines, "\n")
 }

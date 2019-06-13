@@ -29,7 +29,10 @@ func completeTableName(schema *SchemaDesc, text string) psi.Completions {
 	var out psi.Completions
 	for name := range schema.Tables {
 		if strings.HasPrefix(name, text) {
-			out = append(out, psi.Completion(name))
+			out = append(out, &psi.Completion{
+				Kind:    "table",
+				Content: name,
+			})
 		}
 	}
 	return out
@@ -51,7 +54,10 @@ func completeColumnName(schema *SchemaDesc, path *psi.Path) psi.Completions {
 		// TODO: fuzzy in-order-contains instead of has prefix
 		//   i.e. foo => /f.*o.*o/
 		if strings.HasPrefix(name, path.AttrText.Text) {
-			out = append(out, psi.Completion(name))
+			out = append(out, &psi.Completion{
+				Kind:    "column",
+				Content: name,
+			})
 		}
 	}
 	return out
