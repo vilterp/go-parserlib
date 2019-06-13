@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/vilterp/go-parserlib/examples/treesql"
+	"github.com/vilterp/go-parserlib/pkg/psi"
 )
 
 type selectTestCase struct {
@@ -24,15 +25,14 @@ func TestToSelect(t *testing.T) {
      body
 	 }
 	}`,
-			`MANY "posts"@[1:6 - 1:11] {
-  "id"@[2:3 - 2:5]
-  "title"@[3:4 - 3:9]
-  "body"@[4:4 - 4:8]
-  "comments"@[5:3 - 5:11]: MANY "comments"@[5:18 - 5:26] {
-    "id"@[6:5 - 6:7]
-    "body"@[7:6 - 7:10]
-  }
-}`,
+			`Select <many: true, table_name: "posts"@[1:6 - 1:11]>
+  Selection <name: "id"@[2:3 - 2:5]>
+  Selection <name: "title"@[3:4 - 3:9]>
+  Selection <name: "body"@[4:4 - 4:8]>
+  Selection <name: "comments"@[5:3 - 5:11]>
+    Select <many: true, table_name: "comments"@[5:18 - 5:26]>
+      Selection <name: "id"@[6:5 - 6:7]>
+      Selection <name: "body"@[7:6 - 7:10]>`,
 		},
 	}
 
@@ -44,7 +44,7 @@ func TestToSelect(t *testing.T) {
 			}
 			tree := traceTree.ToTree()
 			sel := treesql.ToSelect(tree)
-			actual := sel.Format().String()
+			actual := psi.Format(sel).String()
 			if actual != testCase.output {
 				t.Fatalf("EXPECTED\n\n%v\n\nGOT\n\n%v", testCase.output, actual)
 			}

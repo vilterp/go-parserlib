@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	parserlib "github.com/vilterp/go-parserlib/pkg"
-	pp "github.com/vilterp/go-pretty-print"
 )
 
 type Completion struct {
@@ -18,22 +17,6 @@ func Complete(t *parserlib.Node, cursorPos parserlib.Position) []*Completion {
 		return nil
 	}
 	return nil
-}
-
-// TODO(vilterp): make these implement a PSINode interface??
-//   trace tree => node => PSI node?
-
-// can do completion on this representation
-// and annotate it with errors
-type Select struct {
-	Many       bool
-	TableName  *parserlib.TextNode
-	Selections []*Selection
-}
-
-type Selection struct {
-	Name      *parserlib.TextNode
-	SubSelect *Select
 }
 
 func ToSelect(t *parserlib.Node) *Select {
@@ -86,34 +69,4 @@ func getSelection(n *parserlib.Node) *Selection {
 		out.SubSelect = ToSelect(selects[0])
 	}
 	return out
-}
-
-func (s *Select) Format() pp.Doc {
-	var selDocs []pp.Doc
-	for _, selection := range s.Selections {
-		selDocs = append(selDocs, selection.Format())
-	}
-	return pp.Seq([]pp.Doc{
-		pp.Text("MANY"), // TODO(vilterp): fix
-		pp.Text(" "),
-		pp.Text(s.TableName.String()),
-		pp.Text(" {"),
-		pp.Newline,
-		pp.Indent(2, pp.Join(selDocs, pp.Newline)),
-		pp.Newline,
-		pp.Text("}"),
-	})
-}
-
-func (s *Selection) Format() pp.Doc {
-	if s.SubSelect == nil {
-		return pp.Seq([]pp.Doc{
-			pp.Text(s.Name.String()),
-		})
-	}
-	return pp.Seq([]pp.Doc{
-		pp.Text(s.Name.String()),
-		pp.Text(": "),
-		s.SubSelect.Format(),
-	})
 }
