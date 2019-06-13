@@ -34,9 +34,14 @@ func TestComplete(t *testing.T) {
 		},
 		// column names
 		{
-			`MANY posts { i }`,
+			`MANY posts { p }`,
 			parserlib.Position{Line: 1, Col: 15, Offset: 14},
-			psi.Completions{"id"},
+			psi.Completions{"pics"},
+		},
+		{
+			`MANY comments { p }`,
+			parserlib.Position{Line: 1, Col: 18, Offset: 17},
+			psi.Completions{"post_id"},
 		},
 	}
 

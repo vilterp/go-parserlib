@@ -48,6 +48,8 @@ func completeColumnName(schema *SchemaDesc, path *psi.Path) psi.Completions {
 	}
 	var out psi.Completions
 	for name := range tableDesc.Columns {
+		// TODO: fuzzy in-order-contains instead of has prefix
+		//   i.e. foo => /f.*o.*o/
 		if strings.HasPrefix(name, path.AttrText.Text) {
 			out = append(out, psi.Completion(name))
 		}

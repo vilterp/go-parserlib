@@ -5,13 +5,15 @@ import (
 )
 
 type Path struct {
+	// top to bottom
 	Nodes    []Node
 	NodeName string
 	AttrName string
 	AttrText *parserlib.TextNode
 }
 
-// top to bottom
+// TODO(vilterp): test this
+
 func GetPath(node Node, pos parserlib.Position) *Path {
 	return getPathRecurse(node, nil, pos)
 }
