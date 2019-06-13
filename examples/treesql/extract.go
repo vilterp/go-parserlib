@@ -4,15 +4,7 @@ import (
 	"fmt"
 
 	parserlib "github.com/vilterp/go-parserlib/pkg"
-	"github.com/vilterp/go-parserlib/pkg/psi"
 )
-
-func Complete(t *parserlib.Node, cursorPos parserlib.Position) []*psi.Completion {
-	if !t.Span.Contains(cursorPos) {
-		return nil
-	}
-	return nil
-}
 
 func ToSelect(t *parserlib.Node) *Select {
 	if t.Name != "select" {
