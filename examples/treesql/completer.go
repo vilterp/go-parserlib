@@ -4,15 +4,10 @@ import (
 	"fmt"
 
 	parserlib "github.com/vilterp/go-parserlib/pkg"
+	"github.com/vilterp/go-parserlib/pkg/psi"
 )
 
-type Completion struct {
-	// TODO(vilterp): how does this represent completion partway into a token?
-	Pos  parserlib.Position
-	Text string
-}
-
-func Complete(t *parserlib.Node, cursorPos parserlib.Position) []*Completion {
+func Complete(t *parserlib.Node, cursorPos parserlib.Position) []*psi.Completion {
 	if !t.Span.Contains(cursorPos) {
 		return nil
 	}
