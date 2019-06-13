@@ -42,21 +42,17 @@ func ToSelect(t *parserlib.Node) *Select {
 	}
 
 	tn := t.MustGetChildWithName("table_name")
+	selectionFieldsNode := t.
+		MustGetChildWithName("selections").
+		MustGetChildWithName("selection_fields")
 
-	var subSelections []*Selection
-	for _, child := range t.Children {
-		if child.Name == "selections" {
-			subSelections = getSubSelections(child.Children[0])
-		}
-	}
 	return &Select{
 		Many:       true, // TODO: guess I have to name this in the grammar
 		TableName:  tn.Text(),
-		Selections: subSelections,
+		Selections: getSubSelections(selectionFieldsNode),
 	}
 }
 
-// given a `selections` node
 func getSubSelections(n *parserlib.Node) []*Selection {
 	if n.Name != "selection_fields" {
 		panic("expecting `selections`")
@@ -65,10 +61,13 @@ func getSubSelections(n *parserlib.Node) []*Selection {
 	if len(n.Children) == 0 {
 		return nil
 	}
-	selectionField := n.Children[0]
+
+	selectionField := n.MustGetChildWithName("selection_field")
 	out = append(out, getSelection(selectionField))
-	if len(n.Children) > 1 {
-		nextSelectionFields := n.Children[1]
+
+	nextSelectionFieldss := n.GetChildrenWithName("selection_fields")
+	if len(nextSelectionFieldss) == 1 {
+		nextSelectionFields := nextSelectionFieldss[0]
 		out = append(out, getSubSelections(nextSelectionFields)...)
 	}
 	return out
@@ -78,12 +77,13 @@ func getSelection(n *parserlib.Node) *Selection {
 	if n.Name != "selection_field" {
 		panic(fmt.Sprintf("expecting `selection_field`; got %s", n.Name))
 	}
-	columnName := n.Children[0]
+	columnName := n.MustGetChildWithName("column_name")
 	out := &Selection{
 		Name: columnName.Text(),
 	}
-	if len(n.Children) > 1 {
-		out.SubSelect = ToSelect(n.Children[1])
+	selects := n.GetChildrenWithName("select")
+	if len(selects) == 1 {
+		out.SubSelect = ToSelect(selects[0])
 	}
 	return out
 }
