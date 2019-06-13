@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+enum Form {
+  Burrito = 0;
+  Bowl = 1;
+}
+
+enum Rice {
+  White = 0;
+  Brown = 1;
+}
+
+message Burrito {
+  Form form = 1;
+  Rice rice = 2;
+}
+
+
+// asdfsdf
+
+message SearchRequest {
+  string message = 1;
+}
+
+message MapsResults {
+  message MapResult {
+    string name = 1;
+    string address = 2;
+    int32 start = 3;
+  }
+  
+  repeated MapResult results = 1;
+}
+
+message AdsResults {
+  
+}

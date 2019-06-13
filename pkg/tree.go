@@ -7,9 +7,10 @@ import (
 )
 
 type Node struct {
-	Name     string
-	Span     SourceSpan
-	Children []*Node
+	OrigInput string `json:"-"`
+	Name      string
+	Span      SourceSpan
+	Children  []*Node
 }
 
 type TextNode struct {
@@ -28,7 +29,8 @@ func (tt *TraceTree) ToTree() *Node {
 	case *ref:
 		name = tRule.name
 		return &Node{
-			Name: name,
+			OrigInput: tt.origInput,
+			Name:      name,
 			// TODO(vilterp): use SourceSpan in TraceTree too?
 			Span: SourceSpan{
 				From: tt.StartPos,
@@ -85,10 +87,27 @@ func (n *Node) Format() pp.Doc {
 	return pp.Seq(docs)
 }
 
-// TODO(vilterp): point to origInput somewhere from Node??
-func (n *Node) Text(origInput string) *TextNode {
+func (n *Node) Text() *TextNode {
 	return &TextNode{
 		Span: n.Span,
-		Text: n.Span.GetText(origInput),
+		Text: n.Span.GetText(n.OrigInput),
 	}
+}
+
+func (n *Node) GetChildrenWithName(name string) []*Node {
+	var out []*Node
+	for _, child := range n.Children {
+		if child.Name == name {
+			out = append(out, child)
+		}
+	}
+	return out
+}
+
+func (n *Node) MustGetChildWithName(name string) *Node {
+	children := n.GetChildrenWithName(name)
+	if len(children) != 1 {
+		panic(fmt.Sprintf("expected one child with name %s; got %d", name, len(children)))
+	}
+	return children[0]
 }

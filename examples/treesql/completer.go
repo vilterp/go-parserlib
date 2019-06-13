@@ -36,29 +36,28 @@ type Selection struct {
 	SubSelect *Select
 }
 
-func ToSelect(origInput string, t *parserlib.Node) *Select {
+func ToSelect(t *parserlib.Node) *Select {
 	if t.Name != "select" {
 		panic(fmt.Sprintf("expecting `select` got %s", t.Name))
 	}
-	var tableName *parserlib.TextNode
+
+	tn := t.MustGetChildWithName("table_name")
+
 	var subSelections []*Selection
 	for _, child := range t.Children {
-		if child.Name == "table_name" {
-			tableName = child.Text(origInput)
-		}
 		if child.Name == "selections" {
-			subSelections = getSubSelections(origInput, child.Children[0])
+			subSelections = getSubSelections(child.Children[0])
 		}
 	}
 	return &Select{
 		Many:       true, // TODO: guess I have to name this in the grammar
-		TableName:  tableName,
+		TableName:  tn.Text(),
 		Selections: subSelections,
 	}
 }
 
 // given a `selections` node
-func getSubSelections(origInput string, n *parserlib.Node) []*Selection {
+func getSubSelections(n *parserlib.Node) []*Selection {
 	if n.Name != "selection_fields" {
 		panic("expecting `selections`")
 	}
@@ -67,24 +66,24 @@ func getSubSelections(origInput string, n *parserlib.Node) []*Selection {
 		return nil
 	}
 	selectionField := n.Children[0]
-	out = append(out, getSelection(origInput, selectionField))
+	out = append(out, getSelection(selectionField))
 	if len(n.Children) > 1 {
 		nextSelectionFields := n.Children[1]
-		out = append(out, getSubSelections(origInput, nextSelectionFields)...)
+		out = append(out, getSubSelections(nextSelectionFields)...)
 	}
 	return out
 }
 
-func getSelection(origInput string, n *parserlib.Node) *Selection {
+func getSelection(n *parserlib.Node) *Selection {
 	if n.Name != "selection_field" {
 		panic(fmt.Sprintf("expecting `selection_field`; got %s", n.Name))
 	}
 	columnName := n.Children[0]
 	out := &Selection{
-		Name: columnName.Text(origInput),
+		Name: columnName.Text(),
 	}
 	if len(n.Children) > 1 {
-		out.SubSelect = ToSelect(origInput, n.Children[1])
+		out.SubSelect = ToSelect(n.Children[1])
 	}
 	return out
 }

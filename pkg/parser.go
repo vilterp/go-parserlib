@@ -93,6 +93,7 @@ func (ps *ParserState) runRule(cursor int) (*TraceTree, *ParseError) {
 	rule := frame.rule
 	startPos := frame.pos
 	minimalTrace := &TraceTree{
+		origInput: ps.input,
 		grammar:   ps.grammar,
 		Rule:      rule,
 		StartPos:  startPos,
@@ -102,6 +103,7 @@ func (ps *ParserState) runRule(cursor int) (*TraceTree, *ParseError) {
 	switch tRule := rule.(type) {
 	case *choice:
 		trace := &TraceTree{
+			origInput: ps.input,
 			grammar:   ps.grammar,
 			Rule:      rule,
 			StartPos:  startPos,
@@ -143,6 +145,7 @@ func (ps *ParserState) runRule(cursor int) (*TraceTree, *ParseError) {
 		return trace, frame.Errorf(nil, "no match for rule `%s`", rule.String())
 	case *sequence:
 		trace := &TraceTree{
+			origInput:  ps.input,
 			grammar:    ps.grammar,
 			Rule:       rule,
 			StartPos:   startPos,
@@ -206,6 +209,7 @@ func (ps *ParserState) runRule(cursor int) (*TraceTree, *ParseError) {
 			return minimalTrace, frame.Errorf(err, `no match for rule "%s"`, tRule.name)
 		}
 		return &TraceTree{
+			origInput: ps.input,
 			grammar:   ps.grammar,
 			Rule:      rule,
 			StartPos:  startPos,
@@ -229,6 +233,7 @@ func (ps *ParserState) runRule(cursor int) (*TraceTree, *ParseError) {
 			}
 		}
 		return &TraceTree{
+			origInput:  ps.input,
 			grammar:    ps.grammar,
 			Rule:       rule,
 			StartPos:   startPos,

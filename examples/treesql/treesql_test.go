@@ -112,6 +112,6 @@ func TestToSelect(t *testing.T) {
 		t.Fatal(err)
 	}
 	tree := traceTree.ToTree()
-	sel := treesql.ToSelect(input, tree)
+	sel := treesql.ToSelect(tree)
 	t.Log(sel.Format().String())
 }

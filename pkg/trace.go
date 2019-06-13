@@ -7,7 +7,8 @@ import (
 )
 
 type TraceTree struct {
-	grammar *Grammar
+	grammar   *Grammar
+	origInput string
 
 	Rule      Rule
 	StartPos  Position
