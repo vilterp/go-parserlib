@@ -22,7 +22,7 @@ func TestToSelect(t *testing.T) {
 		},
 		{
 			`MANY `,
-			`Select <many: false> [1:1 - 1:6]`,
+			`Select <many: false, table_name: ""@[1:6 - 1:6]> [1:1 - 1:6]`,
 		},
 		// full query
 		{
@@ -43,6 +43,11 @@ func TestToSelect(t *testing.T) {
     Select <many: true, table_name: "comments"@[5:18 - 5:26]> [5:13 - 8:4]
       Selection <name: "id"@[6:5 - 6:7]> [6:5 - 6:7]
       Selection <name: "body"@[7:6 - 7:10]> [7:6 - 7:10]`,
+		},
+		// TODO: extract where clause...
+		{
+			`MANY posts WHERE id = "foo" {}`,
+			`Select <many: false, table_name: "posts"@[1:6 - 1:11]> [1:1 - 1:18]`,
 		},
 	}
 
