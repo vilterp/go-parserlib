@@ -134,11 +134,7 @@ func (s *server) getResp(req *completionsRequest) (*completionsResponse, error) 
 	resp.PSITree = s.language.Extract(resp.RuleTree)
 	resp.ErrorAnnotations = s.language.AnnotateErrors(resp.PSITree)
 	// TODO(vilterp): get position from cursor offset
-	cursorPos := parserlib.Position{
-		Line:   1,
-		Col:    1,
-		Offset: 0,
-	}
+	cursorPos := parserlib.PositionFromOffset(req.Input, req.CursorPos)
 	resp.Completions = append(
 		resp.Completions,
 		s.language.Complete(resp.PSITree, cursorPos)...,

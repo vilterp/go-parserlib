@@ -11,6 +11,12 @@ type Position struct {
 	Offset int
 }
 
+var StartPos = Position{
+	Line:   1,
+	Col:    1,
+	Offset: 0,
+}
+
 func (pos *Position) String() string {
 	return fmt.Sprintf("line %d, col %d", pos.Line, pos.Col)
 }
@@ -73,4 +79,18 @@ func (ss SourceSpan) GetText(input string) string {
 		return line[ss.From.Col-1 : ss.To.Col-1]
 	}
 	panic("TODO: GetText across multiple lines")
+}
+
+// PositionFromOffset gives a position from a 0-indexed offset
+func PositionFromOffset(doc string, offset int) Position {
+	pos := StartPos
+	for i := 0; i < offset; i++ {
+		char := doc[i]
+		if char == '\n' {
+			pos = pos.Newline()
+		} else {
+			pos = pos.MoreOnLine(1)
+		}
+	}
+	return pos
 }
