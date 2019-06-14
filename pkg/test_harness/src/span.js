@@ -2,6 +2,6 @@ export function formatPos(pos) {
   return `${pos.Line}:${pos.Col}`
 }
 
-export function formatSpan(trace) {
-  return `${formatPos(trace.StartPos)} => ${formatPos(trace.EndPos)}`
+export function formatSpan(span) {
+  return `[${formatPos(span.From)} - ${formatPos(span.To)}]`
 }

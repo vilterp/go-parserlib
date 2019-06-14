@@ -23,3 +23,7 @@ func (c Completions) String() string {
 	}
 	return strings.Join(lines, "\n")
 }
+
+func PrefixMatch(name string, prefix string) bool {
+	return strings.HasPrefix(name, prefix) && len(prefix) < len(name)
+}

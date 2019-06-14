@@ -1,8 +1,6 @@
 package treesql
 
 import (
-	"strings"
-
 	parserlib "github.com/vilterp/go-parserlib/pkg"
 	"github.com/vilterp/go-parserlib/pkg/psi"
 )
@@ -28,7 +26,7 @@ func Complete(sel *Select, schema *SchemaDesc, pos parserlib.Position) psi.Compl
 func completeTableName(schema *SchemaDesc, text string) psi.Completions {
 	var out psi.Completions
 	for name := range schema.Tables {
-		if strings.HasPrefix(name, text) {
+		if psi.PrefixMatch(name, text) {
 			out = append(out, &psi.Completion{
 				Kind:    "table",
 				Content: name,
@@ -53,7 +51,7 @@ func completeColumnName(schema *SchemaDesc, path *psi.Path) psi.Completions {
 	for name := range tableDesc.Columns {
 		// TODO: fuzzy in-order-contains instead of has prefix
 		//   i.e. foo => /f.*o.*o/
-		if strings.HasPrefix(name, path.AttrText.Text) {
+		if psi.PrefixMatch(name, path.AttrText.Text) {
 			out = append(out, &psi.Completion{
 				Kind:    "column",
 				Content: name,

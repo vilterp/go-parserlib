@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import "./App.css";
-import { TraceView } from './TraceView';
 import { GrammarView } from './GrammarView';
-import { SourceView } from './SourceView';
+import {formatSpan} from "./span";
+import {RuleTreeView} from "./RuleTreeView";
 
 const INITIAL_QUERY = `MANY blog_posts {
   id,
@@ -144,14 +144,9 @@ class App extends Component {
               : <span>&lt;don't have both trace & grammar yet&gt;</span>}
           </div>
           <div className="grid-cell app-traceview">
-            <h3>Trace</h3>
+            <h3>Rule Tree</h3>
             {this.state.resp && this.state.grammar
-              ? <TraceView
-                  trace={this.state.resp.TraceTree}
-                  error={this.state.resp.Err}
-                  grammar={this.state.grammar}
-                  {...highlightProps}
-                />
+              ? <RuleTreeView node={this.state.resp.RuleTree} />
               : <span>&lt;don't have both trace & grammar yet&gt;</span>}
           </div>
           <div className="grid-cell app-grammar">
@@ -167,14 +162,6 @@ class App extends Component {
       </div>
     );
   }
-}
-
-function formatPosition(pos) {
-  return `${pos.Line}:${pos.Col}`
-}
-
-function formatSpan(span) {
-  return `[${formatPosition(span.From)}-${formatPosition(span.To)}]`
 }
 
 export default App;
