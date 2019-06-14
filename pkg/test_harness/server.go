@@ -113,7 +113,9 @@ func (s *server) getResp(req *completionsRequest) (*completionsResponse, error) 
 	resp.TraceTree = trace
 	if err != nil {
 		resp.Err = err.Error()
-		log.Println("/completions parse error: ", err.Error())
+	}
+	if trace == nil {
+		return resp, nil
 	}
 
 	// Get completions.

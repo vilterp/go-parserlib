@@ -18,11 +18,11 @@ func TestToSelect(t *testing.T) {
 		// partial queries
 		{
 			``,
-			``,
+			`Select <many: false> [1:1 - 1:1]`,
 		},
 		{
 			`MANY `,
-			``,
+			`Select <many: false> [1:1 - 1:6]`,
 		},
 		// full query
 		{
@@ -48,9 +48,10 @@ func TestToSelect(t *testing.T) {
 
 	for idx, testCase := range cases {
 		t.Run(fmt.Sprintf("case %d", idx), func(t *testing.T) {
-			traceTree, err := treesql.Grammar.Parse("select", testCase.input, 0, nil)
-			if err != nil {
-				t.Fatal(err)
+			traceTree, _ := treesql.Grammar.Parse("select", testCase.input, 0, nil)
+			if traceTree == nil {
+				// TODO: assert this
+				return
 			}
 			tree := traceTree.ToTree()
 			sel := treesql.ToSelect(tree)

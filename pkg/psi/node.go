@@ -53,6 +53,9 @@ func Format(n Node) pp.Doc {
 
 	// format attr nodes
 	for _, attrName := range attrNodeNames {
+		if attrNodes[attrName] == nil {
+			continue
+		}
 		attrDocs = append(attrDocs, pp.Textf("%v: %v", attrName, attrNodes[attrName].String()))
 	}
 

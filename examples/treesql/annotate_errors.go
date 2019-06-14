@@ -20,6 +20,9 @@ type ColDesc struct {
 }
 
 func Annotate(schema *SchemaDesc, n *Select) []*psi.ErrorAnnotation {
+	if n.TableName == nil {
+		return nil
+	}
 	var out []*psi.ErrorAnnotation
 	tableDesc, ok := schema.Tables[n.TableName.Text]
 	if !ok {

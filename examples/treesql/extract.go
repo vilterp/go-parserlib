@@ -11,11 +11,22 @@ func ToSelect(n *parserlib.Node) *Select {
 	if n.Name != "select" {
 		panic(fmt.Sprintf("expecting `select` got %s", n.Name))
 	}
+	base := &Select{
+		BaseNode: psi.BaseNode{Span: n.Span},
+	}
 
-	tn := n.MustGetChildWithName("table_name")
-	selectionFieldsNode := n.
-		MustGetChildWithName("selections").
-		MustGetChildWithName("selection_fields")
+	tn := n.GetChildWithName("table_name")
+	if tn == nil {
+		return base
+	}
+	selectionsNode := n.GetChildWithName("selections")
+	if selectionsNode == nil {
+		return base
+	}
+	selectionFieldsNode := selectionsNode.GetChildWithName("selection_fields")
+	if selectionFieldsNode == nil {
+		return base
+	}
 
 	return &Select{
 		BaseNode:   psi.BaseNode{Span: n.Span},
@@ -34,7 +45,7 @@ func getSubSelections(n *parserlib.Node) []*Selection {
 		return nil
 	}
 
-	selectionField := n.MustGetChildWithName("selection_field")
+	selectionField := n.GetChildWithName("selection_field")
 	out = append(out, getSelection(selectionField))
 
 	nextSelectionFieldss := n.GetChildrenWithName("selection_fields")
@@ -49,7 +60,7 @@ func getSelection(n *parserlib.Node) *Selection {
 	if n.Name != "selection_field" {
 		panic(fmt.Sprintf("expecting `selection_field`; got %s", n.Name))
 	}
-	columnName := n.MustGetChildWithName("column_name")
+	columnName := n.GetChildWithName("column_name")
 	out := &Selection{
 		BaseNode: psi.BaseNode{Span: n.Span},
 		Name:     columnName.Text(),

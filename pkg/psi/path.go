@@ -25,6 +25,9 @@ func getPathRecurse(node Node, nodes []Node, pos parserlib.Position) *Path {
 
 	attrs := node.AttrNodes()
 	for name, attr := range attrs {
+		if attr == nil {
+			continue
+		}
 		if attr.Span.Contains(pos) {
 			return &Path{
 				NodeName: node.TypeName(),

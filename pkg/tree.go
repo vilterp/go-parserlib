@@ -104,10 +104,10 @@ func (n *Node) GetChildrenWithName(name string) []*Node {
 	return out
 }
 
-func (n *Node) MustGetChildWithName(name string) *Node {
+func (n *Node) GetChildWithName(name string) *Node {
 	children := n.GetChildrenWithName(name)
 	if len(children) != 1 {
-		panic(fmt.Sprintf("expected one child with name %s; got %d", name, len(children)))
+		return nil
 	}
 	return children[0]
 }
