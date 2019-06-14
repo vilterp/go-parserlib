@@ -16,6 +16,12 @@ type annotateTestCase struct {
 func TestAnnotate(t *testing.T) {
 	cases := []annotateTestCase{
 		{
+			`MANY boop {}`,
+			[]string{
+				"[1:6 - 1:10]: no table named `boop`",
+			},
+		},
+		{
 			`MANY posts {
   id, body, foo,
   comments: MANY comments {
@@ -25,6 +31,13 @@ func TestAnnotate(t *testing.T) {
 			[]string{
 				"[2:13 - 2:16]: no column `foo` in table `posts`",
 				"[4:9 - 4:12]: no column `bar` in table `comments`",
+			},
+		},
+		{
+			`MANY foo { id, c: MANY comments { doop } }`,
+			[]string{
+				"[1:6 - 1:9]: no table named `foo`",
+				"[1:35 - 1:39]: no column `doop` in table `comments`",
 			},
 		},
 	}

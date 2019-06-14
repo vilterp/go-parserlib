@@ -134,7 +134,7 @@ class App extends Component {
             {/*  : <span>&lt;don't have both trace & grammar yet&gt;</span>}*/}
             {this.state.resp && this.state.grammar
               ? <>
-                  <h2>Errors</h2>
+                  <h3>Errors</h3>
                   <ul>
                     {(this.state.resp.ErrorAnnotations || []).map(err => (
                       <li><code>{formatSpan(err.Span)}: {err.Message}</code></li>
