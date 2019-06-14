@@ -19,6 +19,11 @@ func TestComplete(t *testing.T) {
 	cases := []completionTestCase{
 		// table names
 		{
+			`MANY `,
+			parserlib.Position{Line: 1, Col: 6, Offset: 5},
+			[]string{"table: posts", "table: comments"},
+		},
+		{
 			`MANY po {}`,
 			parserlib.Position{Line: 1, Col: 7, Offset: 6},
 			[]string{"table: posts"},

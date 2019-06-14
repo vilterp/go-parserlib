@@ -20,6 +20,7 @@ class RuleTreeNode extends React.Component {
     return (
       <>
         {this.props.node.Name}
+        {" "}
         {formatSpan(this.props.node.Span)}
         <ul>
           {(this.props.node.Children || []).map((child, idx) => (

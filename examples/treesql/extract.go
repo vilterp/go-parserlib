@@ -19,6 +19,7 @@ func ToSelect(n *parserlib.Node) *Select {
 	if tn == nil {
 		return base
 	}
+	base.TableName = tn.Text()
 	selectionsNode := n.GetChildWithName("selections")
 	if selectionsNode == nil {
 		return base
@@ -28,6 +29,7 @@ func ToSelect(n *parserlib.Node) *Select {
 		return base
 	}
 
+	// TODO: keep modifying base instead...
 	return &Select{
 		BaseNode:   psi.BaseNode{Span: n.Span},
 		Many:       true, // TODO: guess I have to name this in the grammar
