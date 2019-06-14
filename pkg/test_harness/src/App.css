@@ -6,6 +6,11 @@ h3 {
   margin-top: 3px;
 }
 
+.error-view {
+  font-family: monospace;
+  color: red;
+}
+
 .grid-cell {
   border: 1px solid lightgrey;
   padding: 5px;

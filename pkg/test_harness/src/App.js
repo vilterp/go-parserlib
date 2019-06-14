@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import "./App.css";
 import { GrammarView } from './GrammarView';
-import {formatSpan} from "./span";
-import {RuleTreeView} from "./RuleTreeView";
+import { formatSpan } from "./span";
+import { RuleTreeView } from "./RuleTreeView";
+import {CompletionsView} from "./CompletionsView";
 
-const INITIAL_QUERY = `MANY blog_posts {
+const INITIAL_QUERY = `MANY posts {
   id,
   title
 }`;
@@ -117,21 +118,10 @@ class App extends Component {
             <br />
             Pos: {this.state.cursorPos}<br />
             {this.state.resp && this.state.resp.Completions
-              ? <ul>
-                  {this.state.resp.Completions.map((completion) => (
-                    <li key={completion.Content}>{completion.Kind}: {completion.Content}</li>
-                  ))}
-                </ul>
+              ? <CompletionsView completions={this.state.resp.Completions} />
               : null}
           </div>
-          <div className="grid-cell app-sourceview">
-            {/*{this.state.resp && this.state.grammar*/}
-            {/*  ? <SourceView*/}
-            {/*      trace={this.state.resp.TraceTree}*/}
-            {/*      grammar={this.state.grammar}*/}
-            {/*      {...highlightProps}*/}
-            {/*    />*/}
-            {/*  : <span>&lt;don't have both trace & grammar yet&gt;</span>}*/}
+          <div className="grid-cell">
             {this.state.resp && this.state.grammar
               ? <>
                   <h3>Errors</h3>
@@ -145,6 +135,9 @@ class App extends Component {
           </div>
           <div className="grid-cell app-traceview">
             <h3>Rule Tree</h3>
+            {this.state.resp && this.state.resp.Err
+              ? <span className="error-view">{this.state.resp.Err}</span>
+              : null}
             {this.state.resp && this.state.grammar
               ? <RuleTreeView node={this.state.resp.RuleTree} />
               : <span>&lt;don't have both trace & grammar yet&gt;</span>}
