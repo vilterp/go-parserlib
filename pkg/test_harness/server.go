@@ -106,7 +106,9 @@ func (s *server) handleCompletions(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) getResp(req *completionsRequest) (*completionsResponse, error) {
-	resp := &completionsResponse{}
+	resp := &completionsResponse{
+		Completions: []*psi.Completion{},
+	}
 
 	// Parse it.
 	trace, err := s.language.Grammar.Parse("select", req.Input, req.CursorPos, nil)

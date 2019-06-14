@@ -12,7 +12,8 @@ export class SourceView extends React.Component {
   render() {
     return (
       <div className="source-view">
-        <SourceViewNode {...this.props} />
+        {/*<SourceViewNode {...this.props} />*/}
+        (source view removed)
       </div>
     );
   }

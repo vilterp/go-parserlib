@@ -103,8 +103,11 @@ class App extends Component {
           <div className="grid-cell app-editor">
             <textarea
               ref={this.textArea}
-              style={{ fontFamily: "monospace" }}
-              cols={80}
+              style={{
+                fontFamily: "monospace",
+                height: "100%",
+                width: "100%",
+              }}
               rows={10}
               value={this.state.query}
               onChange={this.updateQueryAndPos}
@@ -122,12 +125,22 @@ class App extends Component {
               : null}
           </div>
           <div className="grid-cell app-sourceview">
+            {/*{this.state.resp && this.state.grammar*/}
+            {/*  ? <SourceView*/}
+            {/*      trace={this.state.resp.TraceTree}*/}
+            {/*      grammar={this.state.grammar}*/}
+            {/*      {...highlightProps}*/}
+            {/*    />*/}
+            {/*  : <span>&lt;don't have both trace & grammar yet&gt;</span>}*/}
             {this.state.resp && this.state.grammar
-              ? <SourceView
-                  trace={this.state.resp.TraceTree}
-                  grammar={this.state.grammar}
-                  {...highlightProps}
-                />
+              ? <>
+                  <h2>Errors</h2>
+                  <ul>
+                    {(this.state.resp.ErrorAnnotations || []).map(err => (
+                      <li><code>{formatSpan(err.Span)}: {err.Message}</code></li>
+                    ))}
+                  </ul>
+                </>
               : <span>&lt;don't have both trace & grammar yet&gt;</span>}
           </div>
           <div className="grid-cell app-traceview">
@@ -154,6 +167,14 @@ class App extends Component {
       </div>
     );
   }
+}
+
+function formatPosition(pos) {
+  return `${pos.Line}:${pos.Col}`
+}
+
+function formatSpan(span) {
+  return `[${formatPosition(span.From)}-${formatPosition(span.To)}]`
 }
 
 export default App;

@@ -13,7 +13,8 @@ export class TraceView extends React.Component {
         {this.props.error
           ? <p style={{ color: "red" }}>Error: {this.props.error}</p>
           : null}
-        <TraceNode {...this.props} />
+        {/*<TraceNode {...this.props} />*/}
+        (trace removed)
       </div>
     )
   }
@@ -137,18 +138,6 @@ class TraceNode extends React.Component {
             "rule-regex",
             `"${trace.RegexMatch.replace("\n", "\\n").replace("\t", "\\t")}"`,
           ),
-        );
-      case "MAP":
-        return (
-          <div>
-            MAP
-            <br />
-            <TraceNode
-              grammar={grammar}
-              trace={trace.InnerTrace}
-              {...highlightProps}
-            />
-          </div>
         );
       case "SUCCEED":
         return <span className="rule-succeed">&lt;succeed&gt;</span>;
