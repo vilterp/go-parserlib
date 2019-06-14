@@ -58,7 +58,7 @@ func TestToSelect(t *testing.T) {
 				// TODO: assert this
 				return
 			}
-			tree := traceTree.ToTree()
+			tree := traceTree.ToRuleTree()
 			sel := treesql.ToSelect(tree)
 			actual := psi.Format(sel).String()
 			if actual != testCase.output {

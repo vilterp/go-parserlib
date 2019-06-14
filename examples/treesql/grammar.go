@@ -5,7 +5,7 @@ import p "github.com/vilterp/go-parserlib/pkg"
 var Grammar *p.Grammar
 
 func init() {
-	grammar, err := p.NewGrammar(grammarRules)
+	grammar, err := p.NewGrammar(grammarRules, "select")
 	if err != nil {
 		panic(err)
 	}

@@ -80,7 +80,7 @@ func TestTreeSQL(t *testing.T) {
 	for i, testCase := range testCases {
 		t.Run(fmt.Sprintf("case %d", i), func(t *testing.T) {
 			trace, err := treesql.Grammar.Parse("select", testCase.input, 0, log)
-			tree := trace.ToTree().Format().String()
+			tree := trace.ToRuleTree().Format().String()
 
 			if tree != testCase.output {
 				t.Fatalf("EXPECTED\n\n%v\n\nGOT\n\n%v\n", testCase.output, tree)

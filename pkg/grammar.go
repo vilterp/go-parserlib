@@ -11,7 +11,8 @@ import (
 type RuleID int
 
 type Grammar struct {
-	rules map[string]Rule
+	StartRule string
+	rules     map[string]Rule
 
 	idForRule  map[Rule]RuleID
 	ruleForID  map[RuleID]Rule
@@ -19,8 +20,9 @@ type Grammar struct {
 	nextRuleID RuleID
 }
 
-func NewGrammar(rules map[string]Rule) (*Grammar, error) {
+func NewGrammar(rules map[string]Rule, startRule string) (*Grammar, error) {
 	g := &Grammar{
+		StartRule: startRule,
 		rules:     rules,
 		idForRule: make(map[Rule]RuleID),
 		ruleForID: make(map[RuleID]Rule),
@@ -54,6 +56,9 @@ func (g *Grammar) validate() error {
 		if err := rule.Validate(g); err != nil {
 			return fmt.Errorf(`in rule "%s": %v`, ruleName, err)
 		}
+	}
+	if _, ok := g.rules[g.StartRule]; !ok {
+		return fmt.Errorf("start rule %s not found", g.StartRule)
 	}
 	return nil
 }

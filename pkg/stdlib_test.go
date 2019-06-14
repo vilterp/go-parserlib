@@ -12,7 +12,7 @@ func TestOpt(t *testing.T) {
 			Ref("optbar"),
 			Keyword("baz"),
 		}),
-	})
+	}, "optbar")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -31,7 +31,7 @@ func TestRegexes(t *testing.T) {
 		"str_lit":    StringLit,
 		"ident":      Ident,
 		"whitespace": Whitespace,
-	})
+	}, "int_lit")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -58,7 +58,7 @@ func TestWhitespaceSeq(t *testing.T) {
 			Keyword("b"),
 			Keyword("c"),
 		}),
-	})
+	}, "whitespace_seq")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -77,7 +77,7 @@ type succeedCase struct {
 
 func allShouldSucceed(t *testing.T, g *Grammar, cases []succeedCase) {
 	for caseIdx, testCase := range cases {
-		if _, err := g.Parse(testCase.rule, testCase.input, 0); err != nil {
+		if _, err := g.Parse(testCase.rule, testCase.input, 0, nil); err != nil {
 			t.Errorf("case %d: rule=%s, input=%s, err=%v", caseIdx, testCase.rule, testCase.input, err)
 		}
 	}

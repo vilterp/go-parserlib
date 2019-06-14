@@ -49,7 +49,7 @@ func TestAnnotate(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			tree := traceTree.ToTree()
+			tree := traceTree.ToRuleTree()
 			selectPsi := treesql.ToSelect(tree)
 
 			errors := treesql.Annotate(treesql.BlogSchema, selectPsi)

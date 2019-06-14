@@ -53,7 +53,7 @@ func TestComplete(t *testing.T) {
 	for idx, testCase := range cases {
 		t.Run(fmt.Sprintf("case %d", idx), func(t *testing.T) {
 			traceTree, _ := treesql.Grammar.Parse("select", testCase.input, 0, nil)
-			tree := traceTree.ToTree()
+			tree := traceTree.ToRuleTree()
 			sel := treesql.ToSelect(tree)
 
 			actual := treesql.Complete(sel, treesql.BlogSchema, testCase.cursorPos)

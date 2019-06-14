@@ -128,7 +128,7 @@ func (s *server) getResp(req *completionsRequest) (*completionsResponse, error) 
 	resp.Completions = append(resp.Completions, makeSyntaxCompletions(syntaxCompletions)...)
 
 	// Get rule tree.
-	resp.RuleTree = trace.ToTree()
+	resp.RuleTree = trace.ToRuleTree()
 
 	// Get PSI tree.
 	resp.PSITree = s.language.Extract(resp.RuleTree)

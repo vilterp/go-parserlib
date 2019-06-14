@@ -20,7 +20,7 @@ func TestCompletions(t *testing.T) {
 			Ref("a_or_b"),
 			Ref("c_or_d"),
 		}),
-	})
+	}, "a_or_b")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -75,7 +75,7 @@ func TestCompletions(t *testing.T) {
 		//},
 	}
 	for caseIdx, testCase := range cases {
-		tree, err := testCase.grammar.Parse(testCase.rule, testCase.input, 0)
+		tree, err := testCase.grammar.Parse(testCase.rule, testCase.input, 0, nil)
 		if err != nil {
 			t.Fatal(err)
 		}

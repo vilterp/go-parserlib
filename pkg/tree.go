@@ -22,7 +22,7 @@ func (tn *TextNode) String() string {
 	return fmt.Sprintf(`"%s"@%v`, tn.Text, tn.Span)
 }
 
-func (tt *TraceTree) ToTree() *Node {
+func (tt *TraceTree) ToRuleTree() *Node {
 	rule := tt.Rule
 	name := ""
 	switch tRule := rule.(type) {
@@ -62,7 +62,7 @@ func (tt *TraceTree) getChildren() []*Node {
 	} else if tt.Success {
 		return nil
 	} else if tt.RefTrace != nil {
-		return []*Node{tt.ToTree()}
+		return []*Node{tt.ToRuleTree()}
 	} else {
 		return nil
 	}

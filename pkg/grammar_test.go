@@ -24,7 +24,7 @@ func TestFormat(t *testing.T) {
 }
 
 func TestValidate(t *testing.T) {
-	_, actual := NewGrammar(partialTreeSQLGrammarRules)
+	_, actual := NewGrammar(partialTreeSQLGrammarRules, "select")
 	expected := `in rule "select": in seq item 1: ref not found: "table_name"`
 	if actual.Error() != expected {
 		t.Fatalf("expected `%v`; got `%v`", expected, actual)
