@@ -1,6 +1,8 @@
 package psi
 
-import parserlib "github.com/vilterp/go-parserlib/pkg"
+import (
+	parserlib "github.com/vilterp/go-parserlib/pkg"
+)
 
 type Language struct {
 	Grammar        *parserlib.Grammar
@@ -9,7 +11,7 @@ type Language struct {
 	Complete       func(n Node, p parserlib.Position) []*Completion
 }
 
-func Parse(l *Language, input string) (Node, error) {
+func (l *Language) Parse(input string) (Node, error) {
 	traceTree, err := l.Grammar.Parse(l.Grammar.StartRule, input, 0, nil)
 	if err != nil {
 		return nil, err
