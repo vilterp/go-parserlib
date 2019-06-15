@@ -49,15 +49,17 @@ func (l *Language) ServeCompletions(w http.ResponseWriter, req *http.Request) {
 
 func (l *Language) getCompletions(query string, offset int) *CompletionsResponse {
 	psiTree, err := l.Parse(string(query))
+	if err != nil {
+		return &CompletionsResponse{
+			ParseError: err.Error(),
+		}
+	}
 
 	pos := parserlib.PositionFromOffset(query, offset)
 
 	resp := &CompletionsResponse{
 		Completions: l.Complete(psiTree, pos),
 		Errors:      l.AnnotateErrors(psiTree),
-	}
-	if err != nil {
-		resp.ParseError = err.Error()
 	}
 
 	return resp
