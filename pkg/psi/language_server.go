@@ -48,6 +48,7 @@ func (l *Language) ServeCompletions(w http.ResponseWriter, req *http.Request) {
 }
 
 func (l *Language) GetCompletions(query string, pos parserlib.Position) *CompletionsResponse {
+	pos = pos.EnsurePosition(query)
 	traceTree, err := l.Grammar.Parse(l.Grammar.StartRule, query, 0, nil)
 	ruleTree := traceTree.ToRuleTree()
 	psiTree := l.Extract(ruleTree)

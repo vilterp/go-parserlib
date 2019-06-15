@@ -9,6 +9,6 @@ import (
 func TestLanguageServer(t *testing.T) {
 	l := MakeLanguage(BlogSchema)
 
-	c := l.GetCompletions(``, parserlib.Position{Line: 1, Col: 1, Offset: 0})
-	t.Log(c)
+	c := l.GetCompletions(`MANY `, parserlib.Position{Line: 1, Col: 6})
+	t.Logf(`%+v`, c)
 }

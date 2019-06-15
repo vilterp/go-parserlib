@@ -94,3 +94,18 @@ func PositionFromOffset(doc string, offset int) Position {
 	}
 	return pos
 }
+
+func (p Position) EnsurePosition(origInput string) Position {
+	offset := 0
+	lines := strings.Split(origInput, "\n")
+	for i := 0; i < p.Line-1; i++ {
+		offset += len(lines[i])
+		offset++
+	}
+	offset += p.Col - 1
+	return Position{
+		Line:   p.Line,
+		Col:    p.Col,
+		Offset: offset,
+	}
+}
