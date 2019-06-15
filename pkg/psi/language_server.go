@@ -10,8 +10,8 @@ import (
 )
 
 type CompletionsRequest struct {
-	Query  string
-	Offset int
+	Query     string
+	CursorPos parserlib.Position
 }
 
 type CompletionsResponse struct {
@@ -35,7 +35,7 @@ func (l *Language) ServeCompletions(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	resp := l.getCompletions(compReq.Query, compReq.Offset)
+	resp := l.GetCompletions(compReq.Query, compReq.CursorPos)
 
 	respBytes, err := json.Marshal(resp)
 	if err != nil {
@@ -47,20 +47,17 @@ func (l *Language) ServeCompletions(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func (l *Language) getCompletions(query string, offset int) *CompletionsResponse {
-	psiTree, err := l.Parse(string(query))
-	if err != nil {
-		return &CompletionsResponse{
-			ParseError: err.Error(),
-		}
-	}
-
-	pos := parserlib.PositionFromOffset(query, offset)
+func (l *Language) GetCompletions(query string, pos parserlib.Position) *CompletionsResponse {
+	traceTree, err := l.Grammar.Parse(l.Grammar.StartRule, query, 0, nil)
+	ruleTree := traceTree.ToRuleTree()
+	psiTree := l.Extract(ruleTree)
 
 	resp := &CompletionsResponse{
 		Completions: l.Complete(psiTree, pos),
 		Errors:      l.AnnotateErrors(psiTree),
 	}
-
+	if err != nil {
+		resp.ParseError = err.Error()
+	}
 	return resp
 }
