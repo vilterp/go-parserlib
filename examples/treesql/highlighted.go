@@ -7,7 +7,7 @@ import (
 	"github.com/vilterp/go-parserlib/pkg/psi"
 )
 
-func GetHighlightedElement(n psi.Node, pos parserlib.Position) *psi.HighlightedElement {
+func GetHighlightedElement(n psi.Node, pos parserlib.Position, schema *SchemaDesc) *psi.HighlightedElement {
 	path := psi.GetPath(n, pos)
 
 	if path == nil {
@@ -15,21 +15,28 @@ func GetHighlightedElement(n psi.Node, pos parserlib.Position) *psi.HighlightedE
 	}
 
 	if path.NodeName == "Select" && path.AttrName == "table_name" {
+		tableName := path.AttrText.Text
+		if _, ok := schema.Tables[tableName]; !ok {
+			return nil
+		}
 		return &psi.HighlightedElement{
 			Node: path.AttrText,
-			Path: path.AttrText.Text,
+			Path: tableName,
 		}
 	}
 
 	if path.NodeName == "Selection" && path.AttrName == "name" {
+		colName := path.AttrText.Text
 		table := findContainingTableName(path)
+		tableDesc := schema.Tables[table]
+		if _, ok := tableDesc.Columns[colName]; !ok {
+			return nil
+		}
 		return &psi.HighlightedElement{
-			Path: fmt.Sprintf("%s/%s", table, path.AttrText.Text),
+			Path: fmt.Sprintf("%s/%s", table, colName),
 			Node: path.AttrText,
 		}
 	}
-
-	// TODO(vilterp): don't return stuff if it doesn't exist
 
 	return nil
 }

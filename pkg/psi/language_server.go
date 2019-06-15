@@ -15,9 +15,10 @@ type CompletionsRequest struct {
 }
 
 type CompletionsResponse struct {
-	Errors      []*ErrorAnnotation
-	ParseError  string
-	Completions []*Completion
+	Errors             []*ErrorAnnotation
+	ParseError         string
+	Completions        []*Completion
+	HighlightedElement *HighlightedElement
 }
 
 func (l *Language) ServeCompletions(w http.ResponseWriter, req *http.Request) {
