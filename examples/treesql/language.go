@@ -16,6 +16,9 @@ func MakeLanguage(schema *SchemaDesc) *psi.Language {
 		Extract: func(n *parserlib.Node) psi.Node {
 			return ToSelect(n)
 		},
+		GetHighlightedElement: func(n psi.Node, pos parserlib.Position) *psi.HighlightedElement {
+			return GetHighlightedElement(n, pos)
+		},
 		Grammar: Grammar,
 	}
 }

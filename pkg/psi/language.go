@@ -5,10 +5,11 @@ import (
 )
 
 type Language struct {
-	Grammar        *parserlib.Grammar
-	Extract        func(n *parserlib.Node) Node
-	AnnotateErrors func(n Node) []*ErrorAnnotation
-	Complete       func(n Node, p parserlib.Position) []*Completion
+	Grammar               *parserlib.Grammar
+	Extract               func(n *parserlib.Node) Node
+	AnnotateErrors        func(n Node) []*ErrorAnnotation
+	Complete              func(n Node, pos parserlib.Position) []*Completion
+	GetHighlightedElement func(n Node, pos parserlib.Position) *HighlightedElement
 }
 
 func (l *Language) Parse(input string) (Node, error) {
@@ -18,4 +19,9 @@ func (l *Language) Parse(input string) (Node, error) {
 	}
 	ruleTree := traceTree.ToRuleTree()
 	return l.Extract(ruleTree), nil
+}
+
+type HighlightedElement struct {
+	Node *parserlib.TextNode
+	Path string
 }
