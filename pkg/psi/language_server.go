@@ -52,12 +52,29 @@ func (l *Language) GetCompletions(query string, pos parserlib.Position) *Complet
 	ruleTree := traceTree.ToRuleTree()
 	psiTree := l.Extract(ruleTree)
 
+	syntaxCompletions, _ := traceTree.GetCompletions()
+
 	resp := &CompletionsResponse{
-		Completions: l.Complete(psiTree, pos),
-		Errors:      l.AnnotateErrors(psiTree),
+		Completions: append(
+			makeSyntaxCompletions(syntaxCompletions),
+			l.Complete(psiTree, pos)...,
+		),
+		Errors: l.AnnotateErrors(psiTree),
 	}
 	if err != nil {
 		resp.ParseError = err.Error()
 	}
 	return resp
+}
+
+// TODO(vilterp): dedup this
+func makeSyntaxCompletions(cs []string) Completions {
+	var out Completions
+	for _, c := range cs {
+		out = append(out, &Completion{
+			Kind:    "syntax",
+			Content: c,
+		})
+	}
+	return out
 }
