@@ -61,7 +61,8 @@ func (l *Language) GetCompletions(query string, pos parserlib.Position) *Complet
 			makeSyntaxCompletions(syntaxCompletions),
 			l.Complete(psiTree, pos)...,
 		),
-		Errors: l.AnnotateErrors(psiTree),
+		Errors:             l.AnnotateErrors(psiTree),
+		HighlightedElement: l.GetHighlightedElement(psiTree, pos),
 	}
 	if err != nil {
 		resp.ParseError = err.Error()
