@@ -47,7 +47,7 @@ func TestToSelect(t *testing.T) {
 		// TODO: extract where clause...
 		{
 			`MANY posts WHERE id = "foo" {}`,
-			`Select <many: false, table_name: "posts"@[1:6 - 1:11]> [1:1 - 1:18]`,
+			`Select <many: true, table_name: "posts"@[1:6 - 1:11]> [1:1 - 1:31]`,
 		},
 	}
 
