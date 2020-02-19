@@ -43,7 +43,7 @@ func (k *keyword) Completions(_ *Grammar, _ int) []string {
 }
 
 func (r *ref) Completions(g *Grammar, cursor int) []string {
-	rule := g.rules[r.name]
+	rule := g.rules[r.Name]
 	return rule.Completions(g, cursor)
 }
 

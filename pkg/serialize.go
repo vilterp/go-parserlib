@@ -64,7 +64,7 @@ func (k *keyword) Serialize(g *Grammar) SerializedRule {
 func (r *ref) Serialize(g *Grammar) SerializedRule {
 	return SerializedRule{
 		RuleType: "REF",
-		Ref:      r.name,
+		Ref:      r.Name,
 	}
 }
 

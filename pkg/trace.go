@@ -61,7 +61,7 @@ func (tt *TraceTree) Format() pp.Doc {
 		return pp.Text("SUCCESS")
 	case *ref:
 		return pp.Seq([]pp.Doc{
-			pp.Textf("REF(%s,", tRule.name),
+			pp.Textf("REF(%s,", tRule.Name),
 			pp.Newline,
 			pp.Indent(2, tt.RefTrace.Format()),
 			pp.Newline,

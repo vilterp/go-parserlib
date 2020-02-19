@@ -186,24 +186,24 @@ func (k *keyword) Children() []Rule { return []Rule{} }
 // Rule ref
 
 type ref struct {
-	name string
+	Name string
 }
 
 var _ Rule = &ref{}
 
 func Ref(name string) *ref {
 	return &ref{
-		name: name,
+		Name: name,
 	}
 }
 
 func (r *ref) String() string {
-	return string(r.name)
+	return r.Name
 }
 
 func (r *ref) Validate(g *Grammar) error {
-	if _, ok := g.rules[r.name]; !ok {
-		return fmt.Errorf(`ref not found: "%s"`, r.name)
+	if _, ok := g.rules[r.Name]; !ok {
+		return fmt.Errorf(`ref not found: "%s"`, r.Name)
 	}
 	return nil
 }

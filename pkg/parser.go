@@ -41,7 +41,7 @@ func (g *Grammar) Parse(startRuleName string, input string, cursor int, log logg
 	}
 	initPos := Position{Line: 1, Col: 1, Offset: 0}
 	startRule := &ref{
-		name: startRuleName,
+		Name: startRuleName,
 	}
 	traceTree, err := ps.callRule(startRule, initPos, cursor)
 	if err != nil {
@@ -197,16 +197,16 @@ func (ps *ParserState) runRule(cursor int) (*TraceTree, *ParseError) {
 		}
 		return minimalTrace, frame.Errorf(nil, `expected "%s"; got "%s"`, tRule.value, remainingInput)
 	case *ref:
-		ps.logger.Log("REF:", tRule.name)
-		refRule, ok := ps.grammar.rules[tRule.name]
+		ps.logger.Log("REF:", tRule.Name)
+		refRule, ok := ps.grammar.rules[tRule.Name]
 		if !ok {
-			panic(fmt.Sprintf("nonexistent rule slipped through validation: %s", tRule.name))
+			panic(fmt.Sprintf("nonexistent rule slipped through validation: %s", tRule.Name))
 		}
 		refTrace, err := ps.callRule(refRule, frame.pos, cursor)
 		minimalTrace.RefTrace = refTrace
 		minimalTrace.EndPos = refTrace.EndPos
 		if err != nil {
-			return minimalTrace, frame.Errorf(err, `no match for rule "%s"`, tRule.name)
+			return minimalTrace, frame.Errorf(err, `no match for rule "%s"`, tRule.Name)
 		}
 		return &TraceTree{
 			origInput: ps.input,
