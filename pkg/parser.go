@@ -40,7 +40,7 @@ func (g *Grammar) Parse(startRuleName string, input string, cursor int, log logg
 		logger:  log,
 	}
 	initPos := Position{Line: 1, Col: 1, Offset: 0}
-	startRule := &ref{
+	startRule := &RefRule{
 		Name: startRuleName,
 	}
 	traceTree, err := ps.callRule(startRule, initPos, cursor)
@@ -101,7 +101,7 @@ func (ps *ParserState) runRule(cursor int) (*TraceTree, *ParseError) {
 		EndPos:    startPos,
 	}
 	switch tRule := rule.(type) {
-	case *choice:
+	case *ChoiceRule:
 		trace := &TraceTree{
 			origInput: ps.input,
 			grammar:   ps.grammar,
@@ -143,7 +143,7 @@ func (ps *ParserState) runRule(cursor int) (*TraceTree, *ParseError) {
 			maxAdvancementTraceIndex, tRule.choices[maxAdvancementTraceIndex].String(),
 		)
 		return trace, frame.Errorf(nil, "no match for rule `%s`", rule.String())
-	case *sequence:
+	case *SeqRule:
 		trace := &TraceTree{
 			origInput:  ps.input,
 			grammar:    ps.grammar,
@@ -175,7 +175,7 @@ func (ps *ParserState) runRule(cursor int) (*TraceTree, *ParseError) {
 		}
 		trace.EndPos = frame.pos
 		return trace, nil
-	case *keyword:
+	case *KeywordRule:
 		ps.logger.Log("KEYWORD:", tRule.value)
 		minimalTrace.KeywordMatch = tRule.value
 		remainingInput := ps.input[frame.pos.Offset:]
@@ -196,7 +196,7 @@ func (ps *ParserState) runRule(cursor int) (*TraceTree, *ParseError) {
 			return minimalTrace, nil
 		}
 		return minimalTrace, frame.Errorf(nil, `expected "%s"; got "%s"`, tRule.value, remainingInput)
-	case *ref:
+	case *RefRule:
 		ps.logger.Log("REF:", tRule.Name)
 		refRule, ok := ps.grammar.rules[tRule.Name]
 		if !ok {
@@ -217,7 +217,7 @@ func (ps *ParserState) runRule(cursor int) (*TraceTree, *ParseError) {
 			EndPos:    refTrace.EndPos,
 			RefTrace:  refTrace,
 		}, nil
-	case *regex:
+	case *RegexRule:
 		ps.logger.Log("REGEX:", tRule.regex)
 		loc := tRule.regex.FindStringIndex(ps.input[frame.pos.Offset:])
 		if loc == nil || loc[0] != 0 {
@@ -241,7 +241,7 @@ func (ps *ParserState) runRule(cursor int) (*TraceTree, *ParseError) {
 			EndPos:     endPos,
 			RegexMatch: matchText,
 		}, nil
-	case *succeed:
+	case *SucceedRule:
 		minimalTrace.Success = true
 		return minimalTrace, nil
 	default:

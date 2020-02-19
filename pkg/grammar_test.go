@@ -5,8 +5,8 @@ import "testing"
 var partialTreeSQLGrammarRules = map[string]Rule{
 	"select": Sequence([]Rule{
 		Choice([]Rule{
-			&keyword{value: "ONE"},
-			&keyword{value: "MANY"},
+			&KeywordRule{value: "ONE"},
+			&KeywordRule{value: "MANY"},
 		}),
 		Ref("table_name"),
 		Keyword("{"),

@@ -18,7 +18,7 @@ func ListRule(ruleName string, listName string, sep Rule) Rule {
 }
 
 func Opt(r Rule) Rule {
-	return &choice{
+	return &ChoiceRule{
 		choices: []Rule{
 			r,
 			Succeed,
@@ -37,7 +37,7 @@ func WhitespaceSeq(items []Rule) Rule {
 		}
 		outItems = append(outItems, item)
 	}
-	return &sequence{
+	return &SeqRule{
 		items: outItems,
 	}
 }

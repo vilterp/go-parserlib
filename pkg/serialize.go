@@ -32,7 +32,7 @@ func (g *Grammar) Serialize() *SerializedGrammar {
 	return sg
 }
 
-func (c *choice) Serialize(g *Grammar) SerializedRule {
+func (c *ChoiceRule) Serialize(g *Grammar) SerializedRule {
 	choices := make([]RuleID, len(c.choices))
 	for idx, choice := range c.choices {
 		choices[idx] = g.idForRule[choice]
@@ -43,7 +43,7 @@ func (c *choice) Serialize(g *Grammar) SerializedRule {
 	}
 }
 
-func (s *sequence) Serialize(g *Grammar) SerializedRule {
+func (s *SeqRule) Serialize(g *Grammar) SerializedRule {
 	items := make([]RuleID, len(s.items))
 	for idx, choice := range s.items {
 		items[idx] = g.idForRule[choice]
@@ -54,28 +54,28 @@ func (s *sequence) Serialize(g *Grammar) SerializedRule {
 	}
 }
 
-func (k *keyword) Serialize(g *Grammar) SerializedRule {
+func (k *KeywordRule) Serialize(g *Grammar) SerializedRule {
 	return SerializedRule{
 		RuleType: "KEYWORD",
 		Keyword:  k.value,
 	}
 }
 
-func (r *ref) Serialize(g *Grammar) SerializedRule {
+func (r *RefRule) Serialize(g *Grammar) SerializedRule {
 	return SerializedRule{
 		RuleType: "REF",
 		Ref:      r.Name,
 	}
 }
 
-func (r *regex) Serialize(g *Grammar) SerializedRule {
+func (r *RegexRule) Serialize(g *Grammar) SerializedRule {
 	return SerializedRule{
 		RuleType: "REGEX",
 		Regex:    r.regex.String(),
 	}
 }
 
-func (s *succeed) Serialize(g *Grammar) SerializedRule {
+func (s *SucceedRule) Serialize(g *Grammar) SerializedRule {
 	return SerializedRule{
 		RuleType: "SUCCEED",
 	}
