@@ -11,3 +11,6 @@ ui:
 .PHONY: deps
 deps:
 	cd pkg/test_harness && yarn
+
+test:
+	go test ./...
