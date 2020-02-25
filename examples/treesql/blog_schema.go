@@ -3,19 +3,21 @@ package treesql
 var BlogSchema = &SchemaDesc{
 	Tables: map[string]*TableDesc{
 		"posts": {
+			Name: "posts",
 			Columns: map[string]*ColDesc{
-				"id":    {},
-				"body":  {},
-				"title": {},
+				"id":    {Name: "id"},
+				"body":  {Name: "body"},
+				"title": {Name: "title"},
 				// vv here so that both have a col that starts with p
-				"pics": {},
+				"pics": {Name: "pics"},
 			},
 		},
 		"comments": {
+			Name: "comments",
 			Columns: map[string]*ColDesc{
-				"id":      {},
-				"body":    {},
-				"post_id": {},
+				"id":      {Name: "id"},
+				"body":    {Name: "body"},
+				"post_id": {Name: "post_id"},
 			},
 		},
 	},

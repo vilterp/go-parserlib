@@ -14,3 +14,6 @@ deps:
 
 test:
 	go test ./...
+
+run-test-harness: test-harness
+	./test-harness

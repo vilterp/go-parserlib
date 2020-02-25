@@ -19,6 +19,7 @@ type Node interface {
 	SourceSpan() parserlib.SourceSpan
 	TypeName() string
 	Children() []Node
+	GetScope() Scope
 	// general attributes
 	Attributes() map[string]string
 	// attributes whose values are text nodes

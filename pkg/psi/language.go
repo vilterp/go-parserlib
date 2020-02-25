@@ -6,7 +6,7 @@ import (
 
 type Language struct {
 	Grammar               *parserlib.Grammar
-	Extract               func(n *parserlib.Node) Node
+	Extract               func(n *parserlib.RuleNode) Node
 	AnnotateErrors        func(n Node) []*ErrorAnnotation
 	Complete              func(n Node, pos parserlib.Position) []*Completion
 	GetHighlightedElement func(n Node, pos parserlib.Position) *HighlightedElement

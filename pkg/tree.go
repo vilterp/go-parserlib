@@ -6,11 +6,11 @@ import (
 	pp "github.com/vilterp/go-pretty-print"
 )
 
-type Node struct {
+type RuleNode struct {
 	OrigInput string `json:"-"`
 	Name      string
 	Span      SourceSpan
-	Children  []*Node
+	Children  []*RuleNode
 }
 
 type TextNode struct {
@@ -22,13 +22,13 @@ func (tn *TextNode) String() string {
 	return fmt.Sprintf(`"%s"@%v`, tn.Text, tn.Span)
 }
 
-func (tt *TraceTree) ToRuleTree() *Node {
+func (tt *TraceTree) ToRuleTree() *RuleNode {
 	rule := tt.Rule
 	name := ""
 	switch tRule := rule.(type) {
 	case *ref:
 		name = tRule.name
-		return &Node{
+		return &RuleNode{
 			OrigInput: tt.origInput,
 			Name:      name,
 			// TODO(vilterp): use SourceSpan in TraceTree too?
@@ -43,9 +43,9 @@ func (tt *TraceTree) ToRuleTree() *Node {
 	}
 }
 
-func (tt *TraceTree) getChildren() []*Node {
+func (tt *TraceTree) getChildren() []*RuleNode {
 	if len(tt.ItemTraces) > 0 {
-		var out []*Node
+		var out []*RuleNode
 		for _, itemTrace := range tt.ItemTraces {
 			if itemTrace == nil {
 				continue
@@ -62,13 +62,13 @@ func (tt *TraceTree) getChildren() []*Node {
 	} else if tt.Success {
 		return nil
 	} else if tt.RefTrace != nil {
-		return []*Node{tt.ToRuleTree()}
+		return []*RuleNode{tt.ToRuleTree()}
 	} else {
 		return nil
 	}
 }
 
-func (n *Node) Format() pp.Doc {
+func (n *RuleNode) Format() pp.Doc {
 	var children []pp.Doc
 	for _, child := range n.Children {
 		children = append(children, child.Format())
@@ -87,15 +87,15 @@ func (n *Node) Format() pp.Doc {
 	return pp.Seq(docs)
 }
 
-func (n *Node) Text() *TextNode {
+func (n *RuleNode) Text() *TextNode {
 	return &TextNode{
 		Span: n.Span,
 		Text: n.Span.GetText(n.OrigInput),
 	}
 }
 
-func (n *Node) GetChildrenWithName(name string) []*Node {
-	var out []*Node
+func (n *RuleNode) GetChildrenWithName(name string) []*RuleNode {
+	var out []*RuleNode
 	for _, child := range n.Children {
 		if child.Name == name {
 			out = append(out, child)
@@ -104,7 +104,7 @@ func (n *Node) GetChildrenWithName(name string) []*Node {
 	return out
 }
 
-func (n *Node) GetChildWithName(name string) *Node {
+func (n *RuleNode) GetChildWithName(name string) *RuleNode {
 	children := n.GetChildrenWithName(name)
 	if len(children) != 1 {
 		return nil

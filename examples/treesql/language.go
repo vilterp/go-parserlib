@@ -13,7 +13,7 @@ func MakeLanguage(schema *SchemaDesc) *psi.Language {
 		AnnotateErrors: func(n psi.Node) []*psi.ErrorAnnotation {
 			return Annotate(schema, n.(*Select))
 		},
-		Extract: func(n *parserlib.Node) psi.Node {
+		Extract: func(n *parserlib.RuleNode) psi.Node {
 			return ToSelect(n)
 		},
 		GetHighlightedElement: func(n psi.Node, pos parserlib.Position) *psi.HighlightedElement {

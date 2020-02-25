@@ -18,7 +18,7 @@ type completionsRequest struct {
 
 type completionsResponse struct {
 	TraceTree        *parserlib.TraceTree
-	RuleTree         *parserlib.Node
+	RuleTree         *parserlib.RuleNode
 	PSITree          psi.Node
 	Completions      psi.Completions
 	ErrorAnnotations []*psi.ErrorAnnotation

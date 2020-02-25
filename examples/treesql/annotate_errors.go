@@ -11,10 +11,12 @@ type SchemaDesc struct {
 }
 
 type TableDesc struct {
+	Name    string
 	Columns map[string]*ColDesc
 }
 
 type ColDesc struct {
+	Name string
 	// TODO(vilterp): type
 	// TODO(vilterp): foreign key
 }

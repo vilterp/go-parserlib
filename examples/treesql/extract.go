@@ -7,7 +7,7 @@ import (
 	"github.com/vilterp/go-parserlib/pkg/psi"
 )
 
-func ToSelect(n *parserlib.Node) *Select {
+func ToSelect(n *parserlib.RuleNode) *Select {
 	if n.Name != "select" {
 		panic(fmt.Sprintf("expecting `select` got %s", n.Name))
 	}
@@ -38,7 +38,7 @@ func ToSelect(n *parserlib.Node) *Select {
 	}
 }
 
-func getSubSelections(n *parserlib.Node) []*Selection {
+func getSubSelections(n *parserlib.RuleNode) []*Selection {
 	if n.Name != "selection_fields" {
 		panic("expecting `selections`")
 	}
@@ -58,7 +58,7 @@ func getSubSelections(n *parserlib.Node) []*Selection {
 	return out
 }
 
-func getSelection(n *parserlib.Node) *Selection {
+func getSelection(n *parserlib.RuleNode) *Selection {
 	if n.Name != "selection_field" {
 		panic(fmt.Sprintf("expecting `selection_field`; got %s", n.Name))
 	}

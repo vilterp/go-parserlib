@@ -18,6 +18,10 @@ type Select struct {
 
 var _ psi.Node = &Select{}
 
+func (s *Select) GetScope() psi.Scope {
+	return &TableScope{}
+}
+
 func (*Select) TypeName() string {
 	return "Select"
 }
@@ -53,6 +57,13 @@ var _ psi.Node = &Selection{}
 
 func (s *Selection) TypeName() string {
 	return "Selection"
+}
+
+func (s *Selection) GetScope() psi.Scope {
+	// same scope as parent...?
+	// seems like a common enough use case
+	// most PSI nodes don't introduce a whole new scope
+	return nil
 }
 
 func (s *Selection) Children() []psi.Node {
