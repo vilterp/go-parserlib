@@ -26,8 +26,8 @@ func (tt *TraceTree) ToRuleTree() *RuleNode {
 	rule := tt.Rule
 	name := ""
 	switch tRule := rule.(type) {
-	case *ref:
-		name = tRule.name
+	case *RefRule:
+		name = tRule.Name
 		return &RuleNode{
 			OrigInput: tt.origInput,
 			Name:      name,

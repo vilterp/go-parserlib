@@ -35,7 +35,7 @@ func (tt *TraceTree) Format() pp.Doc {
 	rule := tt.Rule
 
 	switch tRule := rule.(type) {
-	case *choice:
+	case *ChoiceRule:
 		return pp.Seq([]pp.Doc{
 			pp.Textf("CHOICE(%d, ", tt.ChoiceIdx),
 			pp.Newline,
@@ -43,7 +43,7 @@ func (tt *TraceTree) Format() pp.Doc {
 			pp.Newline,
 			pp.Text(")"),
 		})
-	case *sequence:
+	case *SeqRule:
 		seqDocs := make([]pp.Doc, len(tt.ItemTraces))
 		for idx, item := range tt.ItemTraces {
 			seqDocs[idx] = item.Format()
@@ -55,19 +55,19 @@ func (tt *TraceTree) Format() pp.Doc {
 			pp.Newline,
 			pp.Text(")"),
 		})
-	case *regex:
+	case *RegexRule:
 		return pp.Textf("REGEX(%#v)", tt.RegexMatch)
-	case *succeed:
+	case *SucceedRule:
 		return pp.Text("SUCCESS")
-	case *ref:
+	case *RefRule:
 		return pp.Seq([]pp.Doc{
-			pp.Textf("REF(%s,", tRule.name),
+			pp.Textf("REF(%s,", tRule.Name),
 			pp.Newline,
 			pp.Indent(2, tt.RefTrace.Format()),
 			pp.Newline,
 			pp.Text(")"),
 		})
-	case *keyword:
+	case *KeywordRule:
 		return pp.Textf("%#v", tRule.value)
 	default:
 		panic(fmt.Sprintf("don't know how to format a %T trace", rule))

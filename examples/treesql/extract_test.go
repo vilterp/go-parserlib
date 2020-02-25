@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/require"
 	"github.com/vilterp/go-parserlib/examples/treesql"
 	"github.com/vilterp/go-parserlib/pkg/psi"
 )
@@ -62,7 +63,7 @@ func TestToSelect(t *testing.T) {
 			sel := treesql.ToSelect(tree)
 			actual := psi.Format(sel).String()
 			if actual != testCase.output {
-				t.Fatalf("EXPECTED\n\n%v\n\nGOT\n\n%v", testCase.output, actual)
+				require.Equal(t, testCase.output, actual)
 			}
 		})
 	}

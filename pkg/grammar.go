@@ -85,19 +85,19 @@ type Rule interface {
 
 // choice
 
-type choice struct {
+type ChoiceRule struct {
 	choices []Rule
 }
 
-var _ Rule = &choice{}
+var _ Rule = &ChoiceRule{}
 
-func Choice(choices []Rule) *choice {
-	return &choice{
+func Choice(choices []Rule) *ChoiceRule {
+	return &ChoiceRule{
 		choices: choices,
 	}
 }
 
-func (c *choice) String() string {
+func (c *ChoiceRule) String() string {
 	choicesStrs := make([]string, len(c.choices))
 	for idx, choice := range c.choices {
 		choicesStrs[idx] = choice.String()
@@ -105,7 +105,7 @@ func (c *choice) String() string {
 	return fmt.Sprintf("(%s)", strings.Join(choicesStrs, " | "))
 }
 
-func (c *choice) Validate(g *Grammar) error {
+func (c *ChoiceRule) Validate(g *Grammar) error {
 	for idx, choice := range c.choices {
 		if err := choice.Validate(g); err != nil {
 			return fmt.Errorf("in choice %d: %v", idx, err)
@@ -114,25 +114,25 @@ func (c *choice) Validate(g *Grammar) error {
 	return nil
 }
 
-func (c *choice) Children() []Rule {
+func (c *ChoiceRule) Children() []Rule {
 	return c.choices
 }
 
 // sequence
 
-type sequence struct {
+type SeqRule struct {
 	items []Rule
 }
 
-var _ Rule = &sequence{}
+var _ Rule = &SeqRule{}
 
-func Sequence(items []Rule) *sequence {
-	return &sequence{
+func Sequence(items []Rule) *SeqRule {
+	return &SeqRule{
 		items: items,
 	}
 }
 
-func (s *sequence) String() string {
+func (s *SeqRule) String() string {
 	itemsStrs := make([]string, len(s.items))
 	for idx, item := range s.items {
 		itemsStrs[idx] = item.String()
@@ -140,7 +140,7 @@ func (s *sequence) String() string {
 	return fmt.Sprintf("[%s]", strings.Join(itemsStrs, ", "))
 }
 
-func (s *sequence) Validate(g *Grammar) error {
+func (s *SeqRule) Validate(g *Grammar) error {
 	for idx, item := range s.items {
 		if err := item.Validate(g); err != nil {
 			return fmt.Errorf("in seq item %d: %v", idx, err)
@@ -149,30 +149,30 @@ func (s *sequence) Validate(g *Grammar) error {
 	return nil
 }
 
-func (s *sequence) Children() []Rule {
+func (s *SeqRule) Children() []Rule {
 	return s.items
 }
 
 // keyword
 
-type keyword struct {
+type KeywordRule struct {
 	value string
 }
 
-var _ Rule = &keyword{}
+var _ Rule = &KeywordRule{}
 
 // TODO: case insensitivity
-func Keyword(value string) *keyword {
-	return &keyword{
+func Keyword(value string) *KeywordRule {
+	return &KeywordRule{
 		value: value,
 	}
 }
 
-func (k *keyword) String() string {
+func (k *KeywordRule) String() string {
 	return fmt.Sprintf(`"%s"`, k.value)
 }
 
-func (k *keyword) Validate(_ *Grammar) error {
+func (k *KeywordRule) Validate(_ *Grammar) error {
 	for _, char := range k.value {
 		if char == '\n' {
 			return fmt.Errorf("newlines not allowed in keywords: %v", k.value)
@@ -181,73 +181,73 @@ func (k *keyword) Validate(_ *Grammar) error {
 	return nil
 }
 
-func (k *keyword) Children() []Rule { return []Rule{} }
+func (k *KeywordRule) Children() []Rule { return []Rule{} }
 
 // Rule ref
 
-type ref struct {
-	name string
+type RefRule struct {
+	Name string
 }
 
-var _ Rule = &ref{}
+var _ Rule = &RefRule{}
 
-func Ref(name string) *ref {
-	return &ref{
-		name: name,
+func Ref(name string) *RefRule {
+	return &RefRule{
+		Name: name,
 	}
 }
 
-func (r *ref) String() string {
-	return string(r.name)
+func (r *RefRule) String() string {
+	return r.Name
 }
 
-func (r *ref) Validate(g *Grammar) error {
-	if _, ok := g.rules[r.name]; !ok {
-		return fmt.Errorf(`ref not found: "%s"`, r.name)
+func (r *RefRule) Validate(g *Grammar) error {
+	if _, ok := g.rules[r.Name]; !ok {
+		return fmt.Errorf(`ref not found: "%s"`, r.Name)
 	}
 	return nil
 }
 
-func (r *ref) Children() []Rule { return []Rule{} }
+func (r *RefRule) Children() []Rule { return []Rule{} }
 
 // regex
 
-type regex struct {
+type RegexRule struct {
 	regex *regexp.Regexp
 }
 
-var _ Rule = &regex{}
+var _ Rule = &RegexRule{}
 
-func Regex(re *regexp.Regexp) *regex {
-	return &regex{
+func Regex(re *regexp.Regexp) *RegexRule {
+	return &RegexRule{
 		regex: re,
 	}
 }
 
-func (r *regex) String() string {
+func (r *RegexRule) String() string {
 	return fmt.Sprintf("/%s/", r.regex.String())
 }
 
-func (r *regex) Validate(g *Grammar) error {
+func (r *RegexRule) Validate(g *Grammar) error {
 	return nil
 }
 
-func (r *regex) Children() []Rule { return []Rule{} }
+func (r *RegexRule) Children() []Rule { return []Rule{} }
 
 // Succeed
 
-var Succeed = &succeed{}
+var Succeed = &SucceedRule{}
 
-type succeed struct{}
+type SucceedRule struct{}
 
-var _ Rule = &succeed{}
+var _ Rule = &SucceedRule{}
 
-func (s *succeed) String() string {
+func (s *SucceedRule) String() string {
 	return "<succeed>"
 }
 
-func (s *succeed) Validate(g *Grammar) error {
+func (s *SucceedRule) Validate(g *Grammar) error {
 	return nil
 }
 
-func (s *succeed) Children() []Rule { return []Rule{} }
+func (s *SucceedRule) Children() []Rule { return []Rule{} }
