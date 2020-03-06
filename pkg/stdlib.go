@@ -78,3 +78,7 @@ var SignedIntLit = Regex(regexp.MustCompile("-?[0-9]+"))
 var StringLit = Regex(regexp.MustCompile(`\"(\\.|[^"\\])*\"`))
 
 var Ident = Regex(regexp.MustCompile("[a-zA-Z_][a-zA-Z0-9_]*"))
+
+type Formatter interface {
+	Format() pp.Doc
+}
