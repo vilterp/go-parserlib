@@ -1,6 +1,10 @@
 package parserlib
 
-import "regexp"
+import (
+	"regexp"
+
+	pp "github.com/vilterp/go-pretty-print"
+)
 
 func ListRule1(ruleName string, listName string, sep Rule) Rule {
 	return Choice([]Rule{
@@ -48,6 +52,18 @@ func OptWhitespaceSurround(r Rule) Rule {
 		r,
 		OptWhitespace,
 	})
+}
+
+func Block(start string, doc pp.Doc, end string) pp.Doc {
+	return SeqV(
+		pp.Text(start), pp.Newline,
+		pp.Indent(2, doc),
+		pp.Newline, pp.Text(end),
+	)
+}
+
+func SeqV(docs ...pp.Doc) pp.Doc {
+	return pp.Seq(docs)
 }
 
 var Whitespace = Regex(regexp.MustCompile("\\s+"))
