@@ -2,8 +2,6 @@ package parserlib
 
 import (
 	"regexp"
-
-	pp "github.com/vilterp/go-pretty-print"
 )
 
 func ListRule1(ruleName string, listName string, sep Rule) Rule {
@@ -54,18 +52,6 @@ func OptWhitespaceSurround(r Rule) Rule {
 	})
 }
 
-func Block(start string, doc pp.Doc, end string) pp.Doc {
-	return SeqV(
-		pp.Text(start), pp.Newline,
-		pp.Indent(2, doc),
-		pp.Newline, pp.Text(end),
-	)
-}
-
-func SeqV(docs ...pp.Doc) pp.Doc {
-	return pp.Seq(docs)
-}
-
 var Whitespace = Regex(regexp.MustCompile("\\s+"))
 
 var CommaOptWhitespace = Sequence([]Rule{Keyword(","), OptWhitespace})
@@ -78,7 +64,3 @@ var SignedIntLit = Regex(regexp.MustCompile("-?[0-9]+"))
 var StringLit = Regex(regexp.MustCompile(`\"(\\.|[^"\\])*\"`))
 
 var Ident = Regex(regexp.MustCompile("[a-zA-Z_][a-zA-Z0-9_]*"))
-
-type Formatter interface {
-	Format() pp.Doc
-}
