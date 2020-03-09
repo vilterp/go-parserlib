@@ -47,9 +47,7 @@ func (tt *TraceTree) ToRuleTree() *RuleNode {
 				From: tt.StartPos,
 				To:   tt.EndPos,
 			},
-			Children: []*RuleNode{
-				tt.InnerTrace.ToRuleTree(),
-			},
+			Children: tt.InnerTrace.getChildren(),
 		}
 	default:
 		panic(fmt.Sprintf("only should on Ref, not %T", rule))
@@ -74,6 +72,8 @@ func (tt *TraceTree) getChildren() []*RuleNode {
 		return nil
 	} else if tt.Success {
 		return nil
+	} else if tt.InnerTrace != nil {
+		return []*RuleNode{tt.ToRuleTree()}
 	} else if tt.RefTrace != nil {
 		return []*RuleNode{tt.ToRuleTree()}
 	} else {

@@ -95,11 +95,3 @@ func (tt *TraceTree) GetSpan() SourceSpan {
 		To:   tt.EndPos,
 	}
 }
-
-const (
-	PosToLeft = iota
-	PosLeftEdge
-	PosWithin
-	PosRightEdge
-	PosToRight
-)
