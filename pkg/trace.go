@@ -23,8 +23,8 @@ type TraceTree struct {
 	ItemTraces []*TraceTree `json:",omitempty"`
 	// If it's a regex
 	RegexMatch string
-	// If it's a keyword
-	KeywordMatch string
+	// If it's a text
+	TextMatch string
 	// If it's a ref
 	RefTrace *TraceTree `json:",omitempty"`
 	// If it's a success
@@ -69,7 +69,7 @@ func (tt *TraceTree) Format() pp.Doc {
 			pp.Newline,
 			pp.Text(")"),
 		)
-	case *KeywordRule:
+	case *TextRule:
 		return pp.Textf("%#v", tRule.value)
 	case *NamedRule:
 		return pp.SeqV(

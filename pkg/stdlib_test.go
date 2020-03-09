@@ -8,11 +8,11 @@ import (
 
 func TestOpt(t *testing.T) {
 	g, err := NewGrammar(map[string]Rule{
-		"optbar": Opt(Keyword("bar")),
-		"foo_optbar_baz": Sequence([]Rule{
-			Keyword("foo"),
+		"optbar": Opt(Text("bar")),
+		"foo_optbar_baz": Seq([]Rule{
+			Text("foo"),
 			Ref("optbar"),
-			Keyword("baz"),
+			Text("baz"),
 		}),
 	}, "optbar")
 	if err != nil {
@@ -56,9 +56,9 @@ func TestRegexes(t *testing.T) {
 func TestWhitespaceSeq(t *testing.T) {
 	g, err := NewGrammar(map[string]Rule{
 		"whitespace_seq": WhitespaceSeq([]Rule{
-			Keyword("a"),
-			Keyword("b"),
-			Keyword("c"),
+			Text("a"),
+			Text("b"),
+			Text("c"),
 		}),
 	}, "whitespace_seq")
 	if err != nil {
@@ -74,12 +74,12 @@ func TestWhitespaceSeq(t *testing.T) {
 
 func TestListRule1(t *testing.T) {
 	g, err := NewGrammar(map[string]Rule{
-		"block": Sequence([]Rule{
-			Keyword("{"),
+		"block": Seq([]Rule{
+			Text("{"),
 			OptWhitespace,
 			Ref("list"),
 			OptWhitespace,
-			Keyword("}"),
+			Text("}"),
 		}),
 		"list":     ListRule1("singular", "list", CommaOptWhitespace),
 		"singular": Ident,

@@ -128,9 +128,9 @@ class TraceNode extends React.Component {
           </div>
         );
       }
-      case "KEYWORD":
+      case "TEXT":
         return highlightRuleWrapper(
-          highlightSpanWrapper("rule-keyword", `"${rule.Keyword}"`),
+          highlightSpanWrapper("rule-text", `"${rule.Text}"`),
         );
       case "REGEX":
         return highlightRuleWrapper(
@@ -158,7 +158,7 @@ class TraceNode extends React.Component {
     }
 
     const rule = grammar.RulesByID[trace.RuleID];
-    const within = ["KEYWORD", "REGEX"].includes(rule.RuleType) && cursorIsWithin(trace);
+    const within = ["TEXT", "REGEX"].includes(rule.RuleType) && cursorIsWithin(trace);
 
 
     return (

@@ -10,7 +10,7 @@ type SerializedRule struct {
 	InnerRule RuleID
 	Ref       string `json:",omitempty"`
 	Regex     string `json:",omitempty"`
-	Keyword   string `json:",omitempty"`
+	Text      string `json:",omitempty"`
 }
 
 type SerializedGrammar struct {
@@ -54,10 +54,10 @@ func (s *SeqRule) Serialize(g *Grammar) SerializedRule {
 	}
 }
 
-func (k *KeywordRule) Serialize(g *Grammar) SerializedRule {
+func (k *TextRule) Serialize(g *Grammar) SerializedRule {
 	return SerializedRule{
-		RuleType: "KEYWORD",
-		Keyword:  k.value,
+		RuleType: "TEXT",
+		Text:     k.value,
 	}
 }
 

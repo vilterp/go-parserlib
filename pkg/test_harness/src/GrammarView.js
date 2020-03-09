@@ -119,8 +119,8 @@ class RuleView extends React.Component {
             </span>
           )
         );
-      case "KEYWORD":
-        return highlightWrapper(<span className="rule-keyword">"{rule.Keyword}"</span>);
+      case "TEXT":
+        return highlightWrapper(<span className="rule-text">"{rule.Text}"</span>);
       case "REGEX":
         return highlightWrapper(<span className="rule-regex">/${rule.Regex}/</span>);
       case "SUCCEED":

@@ -13,10 +13,10 @@ func init() {
 }
 
 var grammarRules = map[string]p.Rule{
-	"select": p.Sequence([]p.Rule{
+	"select": p.Seq([]p.Rule{
 		p.Choice([]p.Rule{
-			p.Keyword("ONE"),
-			p.Keyword("MANY"),
+			p.Text("ONE"),
+			p.Text("MANY"),
 		}),
 		p.Whitespace,
 		p.Named("table_name", p.Ident),
@@ -26,32 +26,32 @@ var grammarRules = map[string]p.Rule{
 		p.Ref("selections"),
 	}),
 	"column_name": p.Ident,
-	"where_clause": p.Sequence([]p.Rule{
-		p.Keyword("WHERE"),
+	"where_clause": p.Seq([]p.Rule{
+		p.Text("WHERE"),
 		p.Whitespace,
 		p.Ref("column_name"),
 		p.OptWhitespace,
-		p.Keyword("="),
+		p.Text("="),
 		p.OptWhitespace,
 		p.Ref("expr"),
 	}),
-	"selections": p.Sequence([]p.Rule{
-		p.Keyword("{"),
+	"selections": p.Seq([]p.Rule{
+		p.Text("{"),
 		p.OptWhitespaceSurround(
 			p.Ref("selection_fields"),
 		),
-		p.Keyword("}"),
+		p.Text("}"),
 	}),
 	// TODO: intercalate combinator (??)
 	"selection_fields": p.ListRule(
 		"selection_field",
 		"selection_fields",
-		p.Sequence([]p.Rule{p.Keyword(","), p.OptWhitespace}),
+		p.Seq([]p.Rule{p.Text(","), p.OptWhitespace}),
 	),
-	"selection_field": p.Sequence([]p.Rule{
+	"selection_field": p.Seq([]p.Rule{
 		p.Ref("column_name"),
-		p.Opt(p.Sequence([]p.Rule{
-			p.Keyword(":"),
+		p.Opt(p.Seq([]p.Rule{
+			p.Text(":"),
 			p.OptWhitespace,
 			p.Ref("select"),
 		})),

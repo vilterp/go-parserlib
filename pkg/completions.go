@@ -12,7 +12,7 @@ func (tt *TraceTree) GetCompletions() ([]string, error) {
 		return tt.ChoiceTrace.GetCompletions()
 	case *SeqRule:
 		return tt.ItemTraces[tt.AtItemIdx].GetCompletions()
-	case *KeywordRule:
+	case *TextRule:
 		if tt.CursorPos == 0 {
 			return []string{tRule.value}, nil
 		}
@@ -38,7 +38,7 @@ func (s *SeqRule) Completions(_ *Grammar, _ int) []string {
 	return []string{}
 }
 
-func (k *KeywordRule) Completions(_ *Grammar, _ int) []string {
+func (k *TextRule) Completions(_ *Grammar, _ int) []string {
 	return []string{k.value}
 }
 

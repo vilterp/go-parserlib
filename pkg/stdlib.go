@@ -6,7 +6,7 @@ import (
 
 func ListRule1(ruleName string, listName string, sep Rule) Rule {
 	return Choice([]Rule{
-		Sequence([]Rule{
+		Seq([]Rule{
 			Ref(ruleName),
 			sep,
 			Ref(listName),
@@ -45,19 +45,19 @@ func WhitespaceSeq(items []Rule) Rule {
 }
 
 func Block(start string, inner Rule, end string) Rule {
-	return Sequence([]Rule{
-		Keyword(start),
+	return Seq([]Rule{
+		Text(start),
 		OptWhitespace,
 		inner,
-		Sequence([]Rule{
+		Seq([]Rule{
 			OptWhitespace,
-			Keyword(end),
+			Text(end),
 		}),
 	})
 }
 
 func OptWhitespaceSurround(r Rule) Rule {
-	return Sequence([]Rule{
+	return Seq([]Rule{
 		OptWhitespace,
 		r,
 		OptWhitespace,
@@ -66,7 +66,7 @@ func OptWhitespaceSurround(r Rule) Rule {
 
 var Whitespace = Regex(regexp.MustCompile("\\s+"))
 
-var CommaOptWhitespace = Sequence([]Rule{Keyword(","), OptWhitespace})
+var CommaOptWhitespace = Seq([]Rule{Text(","), OptWhitespace})
 
 var UnsignedIntLit = Regex(regexp.MustCompile("[0-9]+"))
 

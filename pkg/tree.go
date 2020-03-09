@@ -66,7 +66,7 @@ func (tt *TraceTree) getChildren() []*RuleNode {
 		return out
 	} else if tt.ChoiceTrace != nil {
 		return tt.ChoiceTrace.getChildren()
-	} else if tt.KeywordMatch != "" {
+	} else if tt.TextMatch != "" {
 		return nil
 	} else if tt.RegexMatch != "" {
 		return nil

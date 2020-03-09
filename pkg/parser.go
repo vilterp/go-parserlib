@@ -175,9 +175,9 @@ func (ps *ParserState) runRule(cursor int) (*TraceTree, *ParseError) {
 		}
 		trace.EndPos = frame.pos
 		return trace, nil
-	case *KeywordRule:
-		ps.logger.Log("KEYWORD:", tRule.value)
-		minimalTrace.KeywordMatch = tRule.value
+	case *TextRule:
+		ps.logger.Log("TEXT:", tRule.value)
+		minimalTrace.TextMatch = tRule.value
 		remainingInput := ps.input[frame.pos.Offset:]
 		if len(tRule.value) > len(remainingInput) {
 			trimmed := strings.TrimPrefix(tRule.value, remainingInput)

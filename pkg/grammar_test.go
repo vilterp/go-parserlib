@@ -3,15 +3,15 @@ package parserlib
 import "testing"
 
 var partialTreeSQLGrammarRules = map[string]Rule{
-	"select": Sequence([]Rule{
+	"select": Seq([]Rule{
 		Choice([]Rule{
-			&KeywordRule{value: "ONE"},
-			&KeywordRule{value: "MANY"},
+			&TextRule{value: "ONE"},
+			&TextRule{value: "MANY"},
 		}),
 		Ref("table_name"),
-		Keyword("{"),
+		Text("{"),
 		Ref("selection"),
-		Keyword("}"),
+		Text("}"),
 	}),
 }
 

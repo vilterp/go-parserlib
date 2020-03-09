@@ -10,13 +10,13 @@ func TestCompletions(t *testing.T) {
 	t.Skip("seem to have broken this while doing rule ids")
 
 	g, err := NewGrammar(map[string]Rule{
-		"a_or_b": Choice([]Rule{Keyword("A"), Keyword("B")}),
-		"c_or_d": Choice([]Rule{Keyword("C"), Keyword("D")}),
-		"ab_then_cd": Sequence([]Rule{
-			Choice([]Rule{Keyword("A"), Keyword("B")}),
-			Choice([]Rule{Keyword("C"), Keyword("D")}),
+		"a_or_b": Choice([]Rule{Text("A"), Text("B")}),
+		"c_or_d": Choice([]Rule{Text("C"), Text("D")}),
+		"ab_then_cd": Seq([]Rule{
+			Choice([]Rule{Text("A"), Text("B")}),
+			Choice([]Rule{Text("C"), Text("D")}),
 		}),
-		"ab_then_cd_refs": Sequence([]Rule{
+		"ab_then_cd_refs": Seq([]Rule{
 			Ref("a_or_b"),
 			Ref("c_or_d"),
 		}),

@@ -126,10 +126,14 @@ type SeqRule struct {
 
 var _ Rule = &SeqRule{}
 
-func Sequence(items []Rule) *SeqRule {
+func Seq(items []Rule) *SeqRule {
 	return &SeqRule{
 		items: items,
 	}
+}
+
+func SeqV(items ...Rule) *SeqRule {
+	return Seq(items)
 }
 
 func (s *SeqRule) String() string {
@@ -153,35 +157,35 @@ func (s *SeqRule) Children() []Rule {
 	return s.items
 }
 
-// keyword
+// Text
 
-type KeywordRule struct {
+type TextRule struct {
 	value string
 }
 
-var _ Rule = &KeywordRule{}
+var _ Rule = &TextRule{}
 
 // TODO: case insensitivity
-func Keyword(value string) *KeywordRule {
-	return &KeywordRule{
+func Text(value string) *TextRule {
+	return &TextRule{
 		value: value,
 	}
 }
 
-func (k *KeywordRule) String() string {
+func (k *TextRule) String() string {
 	return fmt.Sprintf(`"%s"`, k.value)
 }
 
-func (k *KeywordRule) Validate(_ *Grammar) error {
+func (k *TextRule) Validate(_ *Grammar) error {
 	for _, char := range k.value {
 		if char == '\n' {
-			return fmt.Errorf("newlines not allowed in keywords: %v", k.value)
+			return fmt.Errorf("newlines not allowed in texts: %v", k.value)
 		}
 	}
 	return nil
 }
 
-func (k *KeywordRule) Children() []Rule { return []Rule{} }
+func (k *TextRule) Children() []Rule { return []Rule{} }
 
 // Rule ref
 

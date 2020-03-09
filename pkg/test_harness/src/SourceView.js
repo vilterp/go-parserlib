@@ -97,13 +97,13 @@ class SourceViewNode extends React.Component {
           />
         );
       }
-      case "KEYWORD":
+      case "TEXT":
         return highlightWrapper(
           <span
-            className="rule-keyword"
+            className="rule-text"
             style={{ textDecoration: cursorWithin ? "underline" : "none" }}
           >
-            {textWithCursor(rule.Keyword, trace.CursorPos)}
+            {textWithCursor(rule.Text, trace.CursorPos)}
           </span>
         );
       case "REGEX":
