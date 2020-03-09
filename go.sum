@@ -7,6 +7,8 @@ github.com/stretchr/testify v1.5.1 h1:nOGnQDM7FYENwehXlg/kFVnos3rEvtKTjRvOWSzb6H
 github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5cxcmMvtA=
 github.com/vilterp/go-pretty-print v0.0.0-20190524213027-fc66832e8927 h1:PANkRWv26+qwCcV2ORbftbUTFSlymtg6a5RYoBdsKYE=
 github.com/vilterp/go-pretty-print v0.0.0-20190524213027-fc66832e8927/go.mod h1:1W25TC8at3m5sw6sESGa7vDiMO+QIQ4TFiRRr4s6XSQ=
+github.com/vilterp/go-pretty-print v0.0.0-20200306174442-40fcc9df57a2 h1:zlnZmC9PMakfRgiB+6ytjONRRF+wR9zWef1uYTLS9II=
+github.com/vilterp/go-pretty-print v0.0.0-20200306174442-40fcc9df57a2/go.mod h1:1W25TC8at3m5sw6sESGa7vDiMO+QIQ4TFiRRr4s6XSQ=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405 h1:yhCVgyC4o1eVCa2tZl7eS0r+SDo693bJlVdllGtEeKM=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/yaml.v2 v2.2.2 h1:ZCJp+EgiOT7lHqUV2J862kp8Qj64Jo6az82+3Td9dZw=
