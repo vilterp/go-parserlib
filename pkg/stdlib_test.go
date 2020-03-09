@@ -2,6 +2,8 @@ package parserlib
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestOpt(t *testing.T) {
@@ -68,6 +70,24 @@ func TestWhitespaceSeq(t *testing.T) {
 		{"whitespace_seq", "a    b c"},
 		{"whitespace_seq", "a    b\n\tc"},
 	})
+}
+
+func TestListRule1(t *testing.T) {
+	g, err := NewGrammar(map[string]Rule{
+		"block": Sequence([]Rule{
+			Keyword("{"),
+			OptWhitespace,
+			Ref("list"),
+			OptWhitespace,
+			Keyword("}"),
+		}),
+		"list":     ListRule1("singular", "list", CommaOptWhitespace),
+		"singular": Ident,
+	}, "list")
+	require.NoError(t, err)
+
+	_, err = g.Parse("block", "{ A,B }", 1, nil)
+	require.NoError(t, err)
 }
 
 type succeedCase struct {
