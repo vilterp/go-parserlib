@@ -219,6 +219,13 @@ type NamedRule struct {
 
 var _ Rule = &NamedRule{}
 
+func Named(name string, rule Rule) Rule {
+	return &NamedRule{
+		Name:  name,
+		Inner: rule,
+	}
+}
+
 func (n *NamedRule) String() string {
 	return fmt.Sprintf("NAMED(%s, %s)", n.Name, n.Inner.String())
 }
