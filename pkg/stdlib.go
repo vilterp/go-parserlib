@@ -44,6 +44,18 @@ func WhitespaceSeq(items []Rule) Rule {
 	}
 }
 
+func Block(start string, inner Rule, end string) Rule {
+	return Sequence([]Rule{
+		Keyword(start),
+		OptWhitespace,
+		inner,
+		Sequence([]Rule{
+			OptWhitespace,
+			Keyword(end),
+		}),
+	})
+}
+
 func OptWhitespaceSurround(r Rule) Rule {
 	return Sequence([]Rule{
 		OptWhitespace,
