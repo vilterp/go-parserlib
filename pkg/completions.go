@@ -57,3 +57,7 @@ func (r *RegexRule) Completions(_ *Grammar, _ int) []string {
 func (s *SucceedRule) Completions(_ *Grammar, _ int) []string {
 	return []string{}
 }
+
+func (n *NamedRule) Completions(g *Grammar, cursor int) []string {
+	return n.Inner.Completions(g, cursor)
+}

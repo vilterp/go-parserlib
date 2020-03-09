@@ -210,6 +210,27 @@ func (r *RefRule) Validate(g *Grammar) error {
 
 func (r *RefRule) Children() []Rule { return []Rule{} }
 
+// named
+
+type NamedRule struct {
+	Name  string
+	Inner Rule
+}
+
+var _ Rule = &NamedRule{}
+
+func (n *NamedRule) String() string {
+	return fmt.Sprintf("NAMED(%s, %s)", n.Name, n.Inner.String())
+}
+
+func (n *NamedRule) Validate(g *Grammar) error {
+	return n.Inner.Validate(g)
+}
+
+func (n *NamedRule) Children() []Rule {
+	return []Rule{n.Inner}
+}
+
 // regex
 
 type RegexRule struct {

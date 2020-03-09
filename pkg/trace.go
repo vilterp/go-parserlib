@@ -29,6 +29,8 @@ type TraceTree struct {
 	RefTrace *TraceTree `json:",omitempty"`
 	// If it's a success
 	Success bool
+	// If it's a named rule
+	InnerTrace *TraceTree `json:",omitempty"`
 }
 
 func (tt *TraceTree) Format() pp.Doc {

@@ -38,6 +38,19 @@ func (tt *TraceTree) ToRuleTree() *RuleNode {
 			},
 			Children: tt.RefTrace.getChildren(),
 		}
+	case *NamedRule:
+		name = tRule.Name
+		return &RuleNode{
+			OrigInput: tt.origInput,
+			Name:      name,
+			Span: SourceSpan{
+				From: tt.StartPos,
+				To:   tt.EndPos,
+			},
+			Children: []*RuleNode{
+				tt.InnerTrace.ToRuleTree(),
+			},
+		}
 	default:
 		panic(fmt.Sprintf("only should on Ref, not %T", rule))
 	}

@@ -217,6 +217,21 @@ func (ps *ParserState) runRule(cursor int) (*TraceTree, *ParseError) {
 			EndPos:    refTrace.EndPos,
 			RefTrace:  refTrace,
 		}, nil
+	case *NamedRule:
+		ps.logger.Log("NAMED:", tRule.Name)
+		innerTrace, err := ps.callRule(tRule.Inner, frame.pos, cursor)
+		if err != nil {
+			return minimalTrace, err
+		}
+		return &TraceTree{
+			origInput:  ps.input,
+			grammar:    ps.grammar,
+			Rule:       rule,
+			StartPos:   startPos,
+			EndPos:     innerTrace.EndPos,
+			CursorPos:  cursor,
+			InnerTrace: innerTrace,
+		}, nil
 	case *RegexRule:
 		ps.logger.Log("REGEX:", tRule.regex)
 		loc := tRule.regex.FindStringIndex(ps.input[frame.pos.Offset:])

@@ -80,3 +80,11 @@ func (s *SucceedRule) Serialize(g *Grammar) SerializedRule {
 		RuleType: "SUCCEED",
 	}
 }
+
+func (n *NamedRule) Serialize(g *Grammar) SerializedRule {
+	innerID := g.idForRule[n.Inner]
+	return SerializedRule{
+		RuleType:  "NAMED",
+		InnerRule: innerID,
+	}
+}
