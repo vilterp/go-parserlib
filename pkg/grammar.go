@@ -97,6 +97,10 @@ func Choice(choices []Rule) *ChoiceRule {
 	}
 }
 
+func ChoiceV(choices ...Rule) *ChoiceRule {
+	return Choice(choices)
+}
+
 func (c *ChoiceRule) String() string {
 	choicesStrs := make([]string, len(c.choices))
 	for idx, choice := range c.choices {
