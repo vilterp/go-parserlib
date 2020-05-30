@@ -13,6 +13,7 @@ type StreamingParser struct {
 	reader   *bufio.Reader
 	stackTop *StackFrame
 	pos      Position
+	lastErr  *parseError
 }
 
 type StackFrame struct {
@@ -104,7 +105,8 @@ func (sp *StreamingParser) NextEvent() (*Event, error) {
 				return sp.simplePush(choice), nil
 			}
 		}
-		return nil, sp.errorf("no choice matched %s", strconv.QuoteRune(r))
+		sp.errorPop(sp.errorf("no choice matched %s", strconv.QuoteRune(r)))
+		return nil, nil // TODO: ???
 	case *SeqRule:
 		if sp.stackTop.seqItem == len(tRule.items) {
 			return sp.simplePop(), nil
@@ -119,7 +121,8 @@ func (sp *StreamingParser) NextEvent() (*Event, error) {
 				return nil, err
 			}
 			if actualRune != expRune {
-				return nil, sp.errorf("expected %s; got %s", strconv.QuoteRune(expRune), strconv.QuoteRune(actualRune))
+				sp.errorPop(sp.errorf("expected %s; got %s", strconv.QuoteRune(expRune), strconv.QuoteRune(actualRune)))
+				return nil, nil // TODO: ???
 			}
 		}
 		return sp.textPop(tRule.value), nil
@@ -141,17 +144,34 @@ func (sp *StreamingParser) NextEvent() (*Event, error) {
 		if tRule.from <= r && r <= tRule.to {
 			return sp.textPop(string(r)), nil
 		}
-		return nil, sp.errorf("expected %s; got %c", tRule.String(), r)
+		sp.errorPop(sp.errorf("expected %s; got %c", tRule.String(), r))
+		return nil, nil // TODO: ???
 	case *RepSepRule:
-		switch sp.stackTop.repSepState {
-		case RSPreRep:
-			sp.stackTop.repSepState = RSPreSep
-			return sp.simplePush(tRule.Rep), nil
-		case RSPreSep:
-			sp.stackTop.repSepState = RSPreRep
-			return sp.simplePush(tRule.Sep), nil
-		default:
-			panic(fmt.Sprintf("unhandled repsep mode: %v", sp.stackTop.repSepState))
+		for {
+			switch sp.stackTop.repSepState {
+			case RSPreRep:
+				fmt.Println("prerep")
+				sp.stackTop.repSepState = RSInRep
+				return sp.simplePush(tRule.Rep), nil
+			case RSInRep:
+				fmt.Println("inrep")
+				if sp.lastErr != nil {
+					return nil, sp.lastErr
+				}
+				sp.stackTop.repSepState = RSInSep
+			case RSPreSep:
+				fmt.Println("presep")
+				sp.stackTop.repSepState = RSInSep
+				return sp.simplePush(tRule.Sep), nil
+			case RSInSep:
+				fmt.Println("insep")
+				if sp.lastErr != nil {
+					return sp.simplePop(), nil
+				}
+				sp.stackTop.repSepState = RSPreRep
+			default:
+				panic(fmt.Sprintf("unhandled repsep mode: %v", sp.stackTop.repSepState))
+			}
 		}
 	case *SucceedRule:
 		return sp.simplePop(), nil
@@ -215,6 +235,12 @@ func (sp *StreamingParser) textPop(text string) *Event {
 	}
 	sp.popStack()
 	return ret
+}
+
+func (sp *StreamingParser) errorPop(err *parseError) {
+	sp.popStack()
+	// TODO: emit a pop event?
+	sp.lastErr = err
 }
 
 // stack management
