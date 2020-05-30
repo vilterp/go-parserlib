@@ -30,7 +30,9 @@ type RepSepState = int
 
 const (
 	RSPreRep RepSepState = iota
-	RSPostRep
+	RSInRep
+	RSPreSep
+	RSInSep
 	RSDone
 )
 
@@ -102,7 +104,7 @@ func (sp *StreamingParser) NextEvent() (*Event, error) {
 				return sp.simplePush(choice), nil
 			}
 		}
-		return nil, makeParseError(fmt.Sprintf("no choice matched %s", strconv.QuoteRune(r)), sp.pos, sp.stackTop)
+		return nil, sp.errorf("no choice matched %s", strconv.QuoteRune(r))
 	case *SeqRule:
 		if sp.stackTop.seqItem == len(tRule.items) {
 			return sp.simplePop(), nil
@@ -117,16 +119,10 @@ func (sp *StreamingParser) NextEvent() (*Event, error) {
 				return nil, err
 			}
 			if actualRune != expRune {
-				return nil, makeParseError(fmt.Sprintf("expected %s; got %s", strconv.QuoteRune(expRune), strconv.QuoteRune(actualRune)), sp.pos, sp.stackTop)
+				return nil, sp.errorf("expected %s; got %s", strconv.QuoteRune(expRune), strconv.QuoteRune(actualRune))
 			}
 		}
-		sp.popStack()
-		return &Event{
-			Type: PopRule,
-			Rule: tRule,
-			Pos:  sp.pos,
-			Text: tRule.value,
-		}, nil
+		return sp.textPop(tRule.value), nil
 	case *RefRule:
 		if sp.stackTop.refPushed {
 			return sp.simplePop(), nil
@@ -145,12 +141,14 @@ func (sp *StreamingParser) NextEvent() (*Event, error) {
 		if tRule.from <= r && r <= tRule.to {
 			return sp.textPop(string(r)), nil
 		}
-		return nil, makeParseError(fmt.Sprintf("expected %s; got %c", tRule.String(), r), sp.pos, sp.stackTop)
+		return nil, sp.errorf("expected %s; got %c", tRule.String(), r)
 	case *RepSepRule:
 		switch sp.stackTop.repSepState {
 		case RSPreRep:
+			sp.stackTop.repSepState = RSPreSep
 			return sp.simplePush(tRule.Rep), nil
-		case RSPostRep:
+		case RSPreSep:
+			sp.stackTop.repSepState = RSPreRep
 			return sp.simplePush(tRule.Sep), nil
 		default:
 			panic(fmt.Sprintf("unhandled repsep mode: %v", sp.stackTop.repSepState))
@@ -209,13 +207,14 @@ func (sp *StreamingParser) simplePop() *Event {
 }
 
 func (sp *StreamingParser) textPop(text string) *Event {
-	sp.popStack()
-	return &Event{
+	ret := &Event{
 		Type: PopRule,
 		Rule: sp.stackTop.rule,
 		Pos:  sp.pos,
 		Text: text,
 	}
+	sp.popStack()
+	return ret
 }
 
 // stack management
@@ -264,6 +263,10 @@ func (sp *StreamingParser) peekRune() (rune, error) {
 }
 
 // errors
+
+func (sp *StreamingParser) errorf(format string, args ...interface{}) *parseError {
+	return makeParseError(fmt.Sprintf(format, args...), sp.pos, sp.stackTop)
+}
 
 type parseError struct {
 	msg   string
