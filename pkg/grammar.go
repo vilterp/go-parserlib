@@ -3,6 +3,7 @@ package parserlib
 import (
 	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 
 	pp "github.com/vilterp/go-pretty-print"
@@ -177,7 +178,7 @@ func Text(value string) *TextRule {
 }
 
 func (k *TextRule) String() string {
-	return fmt.Sprintf(`"%s"`, k.value)
+	return strconv.Quote(k.value)
 }
 
 func (k *TextRule) Validate(_ *Grammar) error {

@@ -22,6 +22,7 @@ type StackFrame struct {
 
 	seqItem      int
 	choicePushed bool
+	refPushed    bool
 }
 
 func NewStreamingParser(in io.Reader, g *Grammar, startRule string) (*StreamingParser, error) {
@@ -104,6 +105,7 @@ func (sp *StreamingParser) NextEvent() (*Event, error) {
 		return nil, makeParseError(fmt.Sprintf("no choice matched %s", strconv.QuoteRune(r)), sp.pos, sp.stackTop)
 	case *SeqRule:
 		if sp.stackTop.seqItem == len(tRule.items) {
+			sp.popStack()
 			return &Event{
 				Type: PopRule,
 				Rule: tRule,
@@ -136,10 +138,19 @@ func (sp *StreamingParser) NextEvent() (*Event, error) {
 			Text: tRule.value,
 		}, nil
 	case *RefRule:
+		if sp.stackTop.refPushed {
+			sp.popStack()
+			return &Event{
+				Type: PopRule,
+				Rule: tRule,
+				Pos:  sp.pos,
+			}, nil
+		}
 		rule, ok := sp.grammar.rules[tRule.Name]
 		if !ok {
 			panic(fmt.Sprintf("unknown rule: %v", tRule.Name))
 		}
+		sp.stackTop.refPushed = true
 		ret := &Event{
 			Type: PushRule,
 			Rule: rule,
