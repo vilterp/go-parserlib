@@ -78,6 +78,7 @@ func (sp *StreamingParser) NextEvent() (*Event, error) {
 	case *ChoiceRule:
 		// just popped from choice; we're done
 		if sp.stackTop.choicePushed {
+			sp.popStack()
 			return &Event{
 				Type: PopRule,
 				Rule: tRule,
@@ -100,7 +101,7 @@ func (sp *StreamingParser) NextEvent() (*Event, error) {
 				}, nil
 			}
 		}
-		return nil, makeParseError("no choice matched", sp.pos, sp.stackTop)
+		return nil, makeParseError(fmt.Sprintf("no choice matched %s", strconv.QuoteRune(r)), sp.pos, sp.stackTop)
 	case *SeqRule:
 		if sp.stackTop.seqItem == len(tRule.items) {
 			return &Event{

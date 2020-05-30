@@ -181,11 +181,12 @@ func (k *TextRule) String() string {
 }
 
 func (k *TextRule) Validate(_ *Grammar) error {
-	for _, char := range k.value {
-		if char == '\n' {
-			return fmt.Errorf("newlines not allowed in texts: %v", k.value)
-		}
-	}
+	// TODO: I forget why this was necessary
+	//for _, char := range k.value {
+	//	if char == '\n' {
+	//		return fmt.Errorf("newlines not allowed in texts: %v", k.value)
+	//	}
+	//}
 	return nil
 }
 

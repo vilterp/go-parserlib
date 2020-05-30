@@ -24,32 +24,35 @@ var grammarRules = map[string]p.Rule{
 	// object
 	"object": p.SeqV(
 		p.Text("{"),
-		p.OptWhitespace,
+		p.Ref("optWhitespace"),
 		p.Ref("keyValueList"),
-		p.OptWhitespace,
+		p.Ref("optWhitespace"),
 		p.Text("}"),
 	),
 	"keyValueList": p.ListRule("keyValue", "keyValueList", p.Ref("sep")),
 	"keyValue": p.SeqV(
 		p.Ref("stringLit"),
-		p.OptWhitespace,
+		p.Ref("optWhitespace"),
 		p.Text(":"),
-		p.OptWhitespace,
+		p.Ref("optWhitespace"),
 		p.Ref("value"),
 	),
 	// array
 	"array": p.SeqV(
 		p.Text("["),
-		p.OptWhitespace,
+		p.Ref("optWhitespace"),
 		p.Ref("valueList"),
-		p.OptWhitespace,
+		p.Ref("optWhitespace"),
 		p.Text("]"),
 	),
 	"valueList": p.ListRule("value", "valueList", p.Ref("sep")),
-	"sep":       p.SeqV(p.OptWhitespace, p.Text(","), p.OptWhitespace),
+	"sep":       p.SeqV(p.Ref("optWhitespace"), p.Text(","), p.Ref("optWhitespace")),
 	// literals
 	"stringLit": p.StringLit,
 	"numberLit": p.SignedFloatLit,
 	"bool":      p.ChoiceV(p.Text("true"), p.Text("false")),
 	"null":      p.Text("null"),
+	// whitespace
+	"optWhitespace": p.ListRule("whitespace", "optWhitespace", p.Succeed),
+	"whitespace":    p.ChoiceV(p.Text(" "), p.Text("\n"), p.Text("\t")),
 }
