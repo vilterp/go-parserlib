@@ -59,5 +59,5 @@ func (s *SucceedRule) Completions(_ *Grammar, _ int) []string {
 }
 
 func (n *NamedRule) Completions(g *Grammar, cursor int) []string {
-	return n.Inner.Completions(g, cursor)
+	return n.inner.Completions(g, cursor)
 }

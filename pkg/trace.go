@@ -73,7 +73,7 @@ func (tt *TraceTree) Format() pp.Doc {
 		return pp.Textf("%#v", tRule.value)
 	case *NamedRule:
 		return pp.SeqV(
-			pp.Textf("NAMED(%v", tRule.Name),
+			pp.Textf("NAMED(%v", tRule.name),
 			pp.CommaNewline,
 			pp.Indent(2, tt.InnerTrace.Format()),
 			pp.Newline,

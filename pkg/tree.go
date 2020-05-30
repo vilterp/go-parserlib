@@ -39,7 +39,7 @@ func (tt *TraceTree) ToRuleTree() *RuleNode {
 			Children: tt.RefTrace.getChildren(),
 		}
 	case *NamedRule:
-		name = tRule.Name
+		name = tRule.name
 		return &RuleNode{
 			OrigInput: tt.origInput,
 			Name:      name,

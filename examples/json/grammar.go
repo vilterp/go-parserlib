@@ -24,15 +24,8 @@ var grammarRules = map[string]p.Rule{
 	// object
 	"object": p.SeqV(
 		p.Text("{"),
-		p.Ref("keyValueList"),
+		p.RepSep(p.Ref("keyValue"), p.Ref("sep")),
 		p.Text("}"),
-	),
-	"keyValueList": p.SeqV(
-		p.Ref("keyValue"),
-		p.Ref("sep"),
-		p.Ref("keyValue"),
-		p.Ref("sep"),
-		p.Ref("keyValue"),
 	),
 	"keyValue": p.SeqV(
 		p.Ref("stringLit"),
@@ -42,39 +35,29 @@ var grammarRules = map[string]p.Rule{
 	// array
 	"array": p.SeqV(
 		p.Text("["),
-		p.Ref("valueList"),
+		p.RepSep(p.Ref("value"), p.Ref("sep")),
 		p.Text("]"),
 	),
-	"valueList": p.SeqV(
-		p.Ref("value"),
-		p.Ref("sep"),
-		p.Ref("value"),
-		p.Ref("sep"),
-		p.Ref("value"),
-	),
+	// TODO: put whitespace back in
 	"sep": p.Text(","),
 	// literals
-	"stringLit": p.SeqV(p.Text(`"`), p.Ref("stringLitContents"), p.Text(`"`)),
-	"stringLitContents": p.ChoiceV(
-		p.Text(`foo`),
-		p.Text(`bar`),
-		p.Text(`baz`),
-		p.Text(`bloop`),
-		p.Text(`doop`),
-		p.Text(`hello`),
-		p.Text(`world`),
+	"stringLit": p.SeqV(
+		p.Text(`"`),
+		// TODO: escaping, more chars than alphanum
+		// regex: \"(\\.|[^"\\])*\"
+		p.RepSep(p.Ref("alphaNum"), p.Succeed),
+		p.Text(`"`),
 	),
-	"numberLit": p.ChoiceV(
-		p.Text("1"),
-		p.Text("2"),
-		p.Text("3"),
-		p.Text("4"),
-		p.Text("5"),
-		p.Text("6"),
-	),
-	"bool": p.ChoiceV(p.Text("true"), p.Text("false")),
-	"null": p.Text("null"),
+	"numberLit": p.RepSep(p.Ref("digit"), p.Succeed),
+	"bool":      p.ChoiceV(p.Text("true"), p.Text("false")),
+	"null":      p.Text("null"),
 	// whitespace
 	"optWhitespace": p.ListRule("whitespace", "optWhitespace", p.Succeed),
 	"whitespace":    p.ChoiceV(p.Text(" "), p.Text("\n"), p.Text("\t")),
+	"digit":         p.RuneRange('0', '9'),
+	"alphaNum": p.ChoiceV(
+		p.RuneRange('a', 'z'),
+		p.RuneRange('A', 'Z'),
+		p.Ref("digit"),
+	),
 }

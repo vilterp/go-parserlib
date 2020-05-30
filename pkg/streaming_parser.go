@@ -191,7 +191,7 @@ func (sp *StreamingParser) matches(rule Rule, r rune) bool {
 		}
 		return sp.matches(rule, r)
 	case *NamedRule:
-		return sp.matches(tRule.Inner, r)
+		return sp.matches(tRule.inner, r)
 	case *SucceedRule:
 		return true
 	default:

@@ -218,8 +218,8 @@ func (ps *ParserState) runRule(cursor int) (*TraceTree, *ParseError) {
 			RefTrace:  refTrace,
 		}, nil
 	case *NamedRule:
-		ps.logger.Log("NAMED:", tRule.Name)
-		innerTrace, err := ps.callRule(tRule.Inner, frame.pos, cursor)
+		ps.logger.Log("NAMED:", tRule.name)
+		innerTrace, err := ps.callRule(tRule.inner, frame.pos, cursor)
 		if err != nil {
 			return minimalTrace, err
 		}

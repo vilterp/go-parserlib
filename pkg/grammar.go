@@ -2,7 +2,6 @@ package parserlib
 
 import (
 	"fmt"
-	"regexp"
 	"strconv"
 	"strings"
 
@@ -223,54 +222,114 @@ func (r *RefRule) Children() []Rule { return []Rule{} }
 // named
 
 type NamedRule struct {
-	Name  string
-	Inner Rule
+	name  string
+	inner Rule
 }
 
 var _ Rule = &NamedRule{}
 
 func Named(name string, rule Rule) Rule {
 	return &NamedRule{
-		Name:  name,
-		Inner: rule,
+		name:  name,
+		inner: rule,
 	}
 }
 
 func (n *NamedRule) String() string {
-	return fmt.Sprintf("NAMED(%s, %s)", n.Name, n.Inner.String())
+	return fmt.Sprintf("NAMED(%s, %s)", n.name, n.inner.String())
 }
 
 func (n *NamedRule) Validate(g *Grammar) error {
-	return n.Inner.Validate(g)
+	return n.inner.Validate(g)
 }
 
 func (n *NamedRule) Children() []Rule {
-	return []Rule{n.Inner}
+	return []Rule{n.inner}
 }
 
-// regex
+// repsep
 
-type RegexRule struct {
-	regex *regexp.Regexp
+type RepSepRule struct {
+	Rep Rule
+	Sep Rule
 }
 
-var _ Rule = &RegexRule{}
+var _ Rule = &RepSepRule{}
 
-func Regex(re *regexp.Regexp) *RegexRule {
-	return &RegexRule{
-		regex: re,
+func RepSep(rep Rule, sep Rule) *RepSepRule {
+	return &RepSepRule{
+		Rep: rep,
+		Sep: sep,
 	}
 }
 
-func (r *RegexRule) String() string {
-	return fmt.Sprintf("/%s/", r.regex.String())
+func (r *RepSepRule) String() string {
+	return fmt.Sprintf("RepSep(%v, %v)", r.Rep.String(), r.Sep.String())
 }
 
-func (r *RegexRule) Validate(g *Grammar) error {
+func (r *RepSepRule) Validate(g *Grammar) error {
+	if err := r.Rep.Validate(g); err != nil {
+		return err
+	}
+	if err := r.Sep.Validate(g); err != nil {
+		return err
+	}
 	return nil
 }
 
-func (r *RegexRule) Children() []Rule { return []Rule{} }
+func (r *RepSepRule) Completions(g *Grammar, cursor int) []string {
+	return nil
+}
+
+func (r *RepSepRule) Children() []Rule {
+	return []Rule{r.Rep, r.Sep}
+}
+
+func (r *RepSepRule) Serialize(g *Grammar) SerializedRule {
+	panic("implement me")
+}
+
+// rune range
+
+type RuneRangeRule struct {
+	from rune
+	to   rune
+}
+
+var _ Rule = &RuneRangeRule{}
+
+func RuneRange(from rune, to rune) *RuneRangeRule {
+	return &RuneRangeRule{
+		from: from,
+		to:   to,
+	}
+}
+
+func (r *RuneRangeRule) String() string {
+	return fmt.Sprintf("[%c-%c]", r.from, r.to)
+}
+
+func (r *RuneRangeRule) Validate(g *Grammar) error {
+	if r.from >= r.to {
+		return fmt.Errorf(
+			"from %s not less than to %s",
+			strconv.QuoteRune(r.from), strconv.QuoteRune(r.to),
+		)
+	}
+	return nil
+}
+
+func (r *RuneRangeRule) Completions(g *Grammar, cursor int) []string {
+	return nil
+}
+
+func (r *RuneRangeRule) Children() []Rule {
+	return nil
+}
+
+func (r *RuneRangeRule) Serialize(g *Grammar) SerializedRule {
+	panic("implement me")
+}
 
 // Succeed
 
