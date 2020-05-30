@@ -79,14 +79,10 @@ func (sp *StreamingParser) NextEvent() (*Event, error) {
 	case *ChoiceRule:
 		// just popped from choice; we're done
 		if sp.stackTop.choicePushed {
-			sp.popStack()
-			return &Event{
-				Type: PopRule,
-				Rule: tRule,
-				Pos:  sp.pos,
-			}, nil
+			return sp.simplePop(), nil
 		}
 		// have to make choice immediately, right?
+		// TODO: figure out how to do backtracking. lol
 		r, err := sp.peekRune()
 		if err != nil {
 			return nil, err
@@ -94,32 +90,17 @@ func (sp *StreamingParser) NextEvent() (*Event, error) {
 		for _, choice := range tRule.choices {
 			if sp.matches(choice, r) {
 				sp.stackTop.choicePushed = true
-				sp.pushStack(choice)
-				return &Event{
-					Type: PushRule,
-					Rule: choice,
-					Pos:  sp.pos,
-				}, nil
+				return sp.simplePush(choice), nil
 			}
 		}
 		return nil, makeParseError(fmt.Sprintf("no choice matched %s", strconv.QuoteRune(r)), sp.pos, sp.stackTop)
 	case *SeqRule:
 		if sp.stackTop.seqItem == len(tRule.items) {
-			sp.popStack()
-			return &Event{
-				Type: PopRule,
-				Rule: tRule,
-				Pos:  sp.pos,
-			}, nil
+			return sp.simplePop(), nil
 		}
 		item := tRule.items[sp.stackTop.seqItem]
 		sp.stackTop.seqItem++
-		sp.pushStack(item)
-		return &Event{
-			Type: PushRule,
-			Rule: item,
-			Pos:  sp.pos,
-		}, nil
+		return sp.simplePush(item), nil
 	case *TextRule:
 		for _, expRune := range tRule.value {
 			actualRune, err := sp.nextRune()
@@ -139,32 +120,16 @@ func (sp *StreamingParser) NextEvent() (*Event, error) {
 		}, nil
 	case *RefRule:
 		if sp.stackTop.refPushed {
-			sp.popStack()
-			return &Event{
-				Type: PopRule,
-				Rule: tRule,
-				Pos:  sp.pos,
-			}, nil
+			return sp.simplePop(), nil
 		}
 		rule, ok := sp.grammar.rules[tRule.Name]
 		if !ok {
 			panic(fmt.Sprintf("unknown rule: %v", tRule.Name))
 		}
 		sp.stackTop.refPushed = true
-		ret := &Event{
-			Type: PushRule,
-			Rule: rule,
-			Pos:  sp.pos,
-		}
-		sp.pushStack(rule)
-		return ret, nil
+		return sp.simplePush(rule), nil
 	case *SucceedRule:
-		sp.popStack()
-		return &Event{
-			Type: PopRule,
-			Rule: tRule,
-			Pos:  sp.pos,
-		}, nil
+		return sp.simplePop(), nil
 	default:
 		panic(fmt.Sprintf("unhandled rule type: %T", tRule))
 	}
@@ -198,6 +163,28 @@ func (sp *StreamingParser) matches(rule Rule, r rune) bool {
 		panic(fmt.Sprintf("unhandled rule type: %T", tRule))
 	}
 }
+
+// push and pop helpers
+
+func (sp *StreamingParser) simplePush(rule Rule) *Event {
+	sp.pushStack(rule)
+	return &Event{
+		Type: PushRule,
+		Rule: rule,
+		Pos:  sp.pos,
+	}
+}
+
+func (sp *StreamingParser) simplePop() *Event {
+	sp.popStack()
+	return &Event{
+		Type: PopRule,
+		Rule: sp.stackTop.rule,
+		Pos:  sp.pos,
+	}
+}
+
+// stack management
 
 func (sp *StreamingParser) pushStack(rule Rule) *StackFrame {
 	newTop := &StackFrame{
