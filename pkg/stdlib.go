@@ -72,6 +72,8 @@ var UnsignedIntLit = Regex(regexp.MustCompile("[0-9]+"))
 
 var SignedIntLit = Regex(regexp.MustCompile("-?[0-9]+"))
 
+var SignedFloatLit = Regex(regexp.MustCompile("-?[0-9]*(\\.[0-9]+)?"))
+
 // Thank you https://stackoverflow.com/a/2039820
 var StringLit = Regex(regexp.MustCompile(`\"(\\.|[^"\\])*\"`))
 
