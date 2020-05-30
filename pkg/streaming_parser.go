@@ -147,6 +147,13 @@ func (sp *StreamingParser) NextEvent() (*Event, error) {
 		}
 		sp.pushStack(rule)
 		return ret, nil
+	case *SucceedRule:
+		sp.popStack()
+		return &Event{
+			Type: PopRule,
+			Rule: tRule,
+			Pos:  sp.pos,
+		}, nil
 	default:
 		panic(fmt.Sprintf("unhandled rule type: %T", tRule))
 	}

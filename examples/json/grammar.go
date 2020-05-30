@@ -24,29 +24,23 @@ var grammarRules = map[string]p.Rule{
 	// object
 	"object": p.SeqV(
 		p.Text("{"),
-		p.Ref("optWhitespace"),
 		p.Ref("keyValueList"),
-		p.Ref("optWhitespace"),
 		p.Text("}"),
 	),
 	"keyValueList": p.ListRule("keyValue", "keyValueList", p.Ref("sep")),
 	"keyValue": p.SeqV(
 		p.Ref("stringLit"),
-		p.Ref("optWhitespace"),
 		p.Text(":"),
-		p.Ref("optWhitespace"),
 		p.Ref("value"),
 	),
 	// array
 	"array": p.SeqV(
 		p.Text("["),
-		p.Ref("optWhitespace"),
 		p.Ref("valueList"),
-		p.Ref("optWhitespace"),
 		p.Text("]"),
 	),
 	"valueList": p.ListRule("value", "valueList", p.Ref("sep")),
-	"sep":       p.SeqV(p.Ref("optWhitespace"), p.Text(","), p.Ref("optWhitespace")),
+	"sep":       p.Text(","),
 	// literals
 	"stringLit": p.StringLit,
 	"numberLit": p.SignedFloatLit,
