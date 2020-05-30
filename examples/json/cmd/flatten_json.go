@@ -17,9 +17,12 @@ func main() {
 	}
 	for {
 		evt, err := parser.NextEvent()
-		if err == io.EOF {
-			break
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			log.Fatal(err)
 		}
-		fmt.Printf("evt %#v\n", evt)
+		fmt.Println("evt", evt)
 	}
 }

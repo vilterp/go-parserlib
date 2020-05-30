@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"strconv"
 	"unicode/utf8"
 )
 
@@ -53,6 +54,11 @@ const (
 	PopRule
 )
 
+var nameForType = map[EvtType]string{
+	PushRule: "Push",
+	PopRule:  "Pop",
+}
+
 type Event struct {
 	Type EvtType
 	Rule Rule
@@ -60,10 +66,17 @@ type Event struct {
 	Text string
 }
 
+func (e *Event) String() string {
+	return fmt.Sprintf(
+		"Evt{type: %s, rule: %s, text: %s, pos: %s}",
+		nameForType[e.Type], e.Rule.String(), strconv.Quote(e.Text), e.Pos.CompactString(),
+	)
+}
+
 func (sp *StreamingParser) NextEvent() (*Event, error) {
 	switch tRule := sp.stackTop.rule.(type) {
 	case *ChoiceRule:
-		// just poppsed from choice; we're done
+		// just popped from choice; we're done
 		if sp.stackTop.choicePushed {
 			return &Event{
 				Type: PopRule,
@@ -72,7 +85,7 @@ func (sp *StreamingParser) NextEvent() (*Event, error) {
 			}, nil
 		}
 		// have to make choice immediately, right?
-		r, err := sp.nextRune()
+		r, err := sp.peekRune()
 		if err != nil {
 			return nil, err
 		}
@@ -87,7 +100,7 @@ func (sp *StreamingParser) NextEvent() (*Event, error) {
 				}, nil
 			}
 		}
-		return nil, fmt.Errorf("no choice matched")
+		return nil, makeParseError("no choice matched", sp.pos, sp.stackTop)
 	case *SeqRule:
 		if sp.stackTop.seqItem == len(tRule.items) {
 			return &Event{
@@ -97,8 +110,8 @@ func (sp *StreamingParser) NextEvent() (*Event, error) {
 			}, nil
 		}
 		item := tRule.items[sp.stackTop.seqItem]
-		sp.pushStack(item)
 		sp.stackTop.seqItem++
+		sp.pushStack(item)
 		return &Event{
 			Type: PushRule,
 			Rule: item,
@@ -111,7 +124,7 @@ func (sp *StreamingParser) NextEvent() (*Event, error) {
 				return nil, err
 			}
 			if actualRune != expRune {
-				return nil, fmt.Errorf("expected %v; got %v", expRune, actualRune)
+				return nil, makeParseError(fmt.Sprintf("expected %s; got %s", strconv.QuoteRune(expRune), strconv.QuoteRune(actualRune)), sp.pos, sp.stackTop)
 			}
 		}
 		sp.popStack()
@@ -191,7 +204,7 @@ func (sp *StreamingParser) nextRune() (rune, error) {
 	}
 	if r == '\n' {
 		sp.pos.Line++
-		sp.pos.Col = 0
+		sp.pos.Col = 1
 	} else {
 		sp.pos.Col++
 	}
@@ -208,4 +221,32 @@ func (sp *StreamingParser) peekRune() (rune, error) {
 		return 0, err
 	}
 	return r, nil
+}
+
+// errors
+
+type parseError struct {
+	msg   string
+	pos   Position
+	stack *StackFrame
+}
+
+func makeParseError(msg string, pos Position, stack *StackFrame) *parseError {
+	return &parseError{
+		msg:   msg,
+		pos:   pos,
+		stack: stack,
+	}
+}
+
+func (e *parseError) Error() string {
+	return fmt.Sprintf("parse error at %v: %v.\nStack:\n%v", e.pos.CompactString(), e.msg, formatStackTrace(e.stack))
+}
+
+func formatStackTrace(frame *StackFrame) string {
+	if frame == nil {
+		return ""
+	}
+	frameFmt := frame.rule.String()
+	return "  " + frameFmt + "\n" + formatStackTrace(frame.parent)
 }
