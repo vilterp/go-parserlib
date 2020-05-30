@@ -57,8 +57,6 @@ func (tt *TraceTree) Format() pp.Doc {
 			pp.Newline,
 			pp.Text(")"),
 		)
-	case *RegexRule:
-		return pp.Textf("REGEX(%#v)", tt.RegexMatch)
 	case *SucceedRule:
 		return pp.Text("SUCCESS")
 	case *RefRule:

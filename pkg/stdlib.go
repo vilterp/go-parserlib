@@ -1,9 +1,5 @@
 package parserlib
 
-import (
-	"regexp"
-)
-
 func ListRule1(ruleName string, listName string, sep Rule) Rule {
 	return Choice([]Rule{
 		Seq([]Rule{
@@ -27,6 +23,8 @@ func Opt(r Rule) Rule {
 		},
 	}
 }
+
+var Whitespace = ChoiceV(Text(" "), Text("\n"), Text("\t"))
 
 var OptWhitespace = Opt(Whitespace)
 
@@ -64,17 +62,4 @@ func OptWhitespaceSurround(r Rule) Rule {
 	})
 }
 
-var Whitespace = Regex(regexp.MustCompile("\\s+"))
-
 var CommaOptWhitespace = Seq([]Rule{Text(","), OptWhitespace})
-
-var UnsignedIntLit = Regex(regexp.MustCompile("[0-9]+"))
-
-var SignedIntLit = Regex(regexp.MustCompile("-?[0-9]+"))
-
-var SignedFloatLit = Regex(regexp.MustCompile("-?[0-9]*(\\.[0-9]+)?"))
-
-// Thank you https://stackoverflow.com/a/2039820
-var StringLit = Regex(regexp.MustCompile(`\"(\\.|[^"\\])*\"`))
-
-var Ident = Regex(regexp.MustCompile("[a-zA-Z_][a-zA-Z0-9_]*"))

@@ -23,7 +23,16 @@ type StackFrame struct {
 	seqItem      int
 	choicePushed bool
 	refPushed    bool
+	repSepState  RepSepState
 }
+
+type RepSepState = int
+
+const (
+	RSPreRep RepSepState = iota
+	RSPostRep
+	RSDone
+)
 
 func NewStreamingParser(in io.Reader, g *Grammar, startRule string) (*StreamingParser, error) {
 	// TODO: validate that there are no regex rules...?
@@ -128,6 +137,24 @@ func (sp *StreamingParser) NextEvent() (*Event, error) {
 		}
 		sp.stackTop.refPushed = true
 		return sp.simplePush(rule), nil
+	case *RuneRangeRule:
+		r, err := sp.nextRune()
+		if err != nil {
+			return nil, err
+		}
+		if tRule.from <= r && r <= tRule.to {
+			return sp.textPop(string(r)), nil
+		}
+		return nil, makeParseError(fmt.Sprintf("expected %s; got %c", tRule.String(), r), sp.pos, sp.stackTop)
+	case *RepSepRule:
+		switch sp.stackTop.repSepState {
+		case RSPreRep:
+			return sp.simplePush(tRule.Rep), nil
+		case RSPostRep:
+			return sp.simplePush(tRule.Sep), nil
+		default:
+			panic(fmt.Sprintf("unhandled repsep mode: %v", sp.stackTop.repSepState))
+		}
 	case *SucceedRule:
 		return sp.simplePop(), nil
 	default:
@@ -157,6 +184,8 @@ func (sp *StreamingParser) matches(rule Rule, r rune) bool {
 		return sp.matches(rule, r)
 	case *NamedRule:
 		return sp.matches(tRule.inner, r)
+	case *RuneRangeRule:
+		return tRule.from <= r && r <= tRule.to
 	case *SucceedRule:
 		return true
 	default:
@@ -176,11 +205,16 @@ func (sp *StreamingParser) simplePush(rule Rule) *Event {
 }
 
 func (sp *StreamingParser) simplePop() *Event {
+	return sp.textPop("")
+}
+
+func (sp *StreamingParser) textPop(text string) *Event {
 	sp.popStack()
 	return &Event{
 		Type: PopRule,
 		Rule: sp.stackTop.rule,
 		Pos:  sp.pos,
+		Text: text,
 	}
 }
 

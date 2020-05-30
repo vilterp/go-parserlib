@@ -47,13 +47,6 @@ func (r *RefRule) Completions(g *Grammar, cursor int) []string {
 	return rule.Completions(g, cursor)
 }
 
-func (r *RegexRule) Completions(_ *Grammar, _ int) []string {
-	// TODO: derive minimum value that passes regex?
-	// get rid of regexes altogether and just build them
-	// using the parser itself?
-	return []string{}
-}
-
 func (s *SucceedRule) Completions(_ *Grammar, _ int) []string {
 	return []string{}
 }

@@ -232,30 +232,6 @@ func (ps *ParserState) runRule(cursor int) (*TraceTree, *ParseError) {
 			CursorPos:  cursor,
 			InnerTrace: innerTrace,
 		}, nil
-	case *RegexRule:
-		ps.logger.Log("REGEX:", tRule.regex)
-		loc := tRule.regex.FindStringIndex(ps.input[frame.pos.Offset:])
-		if loc == nil || loc[0] != 0 {
-			return minimalTrace, frame.Errorf(nil, "no match found for regex %s", tRule.regex)
-		}
-		matchText := ps.input[frame.pos.Offset : frame.pos.Offset+loc[1]]
-		endPos := frame.pos
-		for _, char := range matchText {
-			if char == '\n' {
-				endPos = endPos.Newline()
-			} else {
-				endPos = endPos.MoreOnLine(1)
-			}
-		}
-		return &TraceTree{
-			origInput:  ps.input,
-			grammar:    ps.grammar,
-			Rule:       rule,
-			StartPos:   startPos,
-			CursorPos:  cursor,
-			EndPos:     endPos,
-			RegexMatch: matchText,
-		}, nil
 	case *SucceedRule:
 		minimalTrace.Success = true
 		return minimalTrace, nil

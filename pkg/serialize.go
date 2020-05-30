@@ -68,13 +68,6 @@ func (r *RefRule) Serialize(g *Grammar) SerializedRule {
 	}
 }
 
-func (r *RegexRule) Serialize(g *Grammar) SerializedRule {
-	return SerializedRule{
-		RuleType: "REGEX",
-		Regex:    r.regex.String(),
-	}
-}
-
 func (s *SucceedRule) Serialize(g *Grammar) SerializedRule {
 	return SerializedRule{
 		RuleType: "SUCCEED",
