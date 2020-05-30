@@ -25,4 +25,5 @@ func main() {
 		}
 		fmt.Println("evt", evt)
 	}
+	fmt.Println("got to the end")
 }
